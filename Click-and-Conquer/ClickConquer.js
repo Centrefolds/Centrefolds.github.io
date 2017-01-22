@@ -3732,12 +3732,12 @@ window.setInterval(function(){
 			YearsREALLYPLAYED+=0.1;
 			timerClick=300;
 			biggerTimerClick=1000;
-			users[numUser].active=true;
+			//users[numUser].active=true;
 		} else if (timerClick>0 && Time>0){
 			YearsREALLYPLAYED+=0.1;
-			users[numUser].active=true;
+			//users[numUser].active=true;
 		}else if (biggerTimerClick>0 && timerClick<=0 && Time>0) {
-			users[numUser].active=false;
+			//users[numUser].active=false;
 		} else {
 			Pause();
 		};
@@ -3754,8 +3754,8 @@ window.setInterval(function(){
 		
 		verifyAchievements();
 		
-		sortUsers();
-		updateRanking();
+		//sortUsers();
+		//updateRanking();
 		
 	}; }
 	
