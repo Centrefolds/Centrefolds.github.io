@@ -78,15 +78,15 @@ function save(savetype){
 	try {
 		xmlhttp = new XMLHttpRequest();
 		xmlhttp.overrideMimeType('text/plain');
-		xmlhttp.open("GET", "version.txt?r=" + Math.random(),true);
-		xmlhttp.onreadystatechange=function() {
+		//xmlhttp.open("GET", "version.txt?r=" + Math.random(),true);
+		/*xmlhttp.onreadystatechange=function() {
 			if (xmlhttp.readyState==4) {
 				var sVersion = parseInt(xmlhttp.responseText);
 				if (version < sVersion){
 					versionAlert();
 				}
 			}
-		}
+		}*/
 		xmlhttp.send(null)
 	} catch (err) {
 		console.log('XMLHttpRequest failed')
