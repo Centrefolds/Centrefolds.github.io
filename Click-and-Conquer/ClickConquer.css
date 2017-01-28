@@ -26,7 +26,7 @@
 	top: 10px; vertical-align: top; position: relative; display:inline-block; height:110px; width:30%; min-width:150px;
 }
 .PlanetTextVertical{
-vertical-align: top; top:40px; position: absolute; display:inline-block; padding-left:2%; left: 0; width:5%; min-width:30px;
+left:0; height: 130px; position: absolute; display:inline-block; padding-left:2%; width:5%; min-width:30px; line-height: 130px;  
 }
 .headerButton{
 	 height: 100%; text-align: center; line-height:30px; display: inline-block; min-width: 50px; padding-left: 10px; padding-right: 10px;  list-style:none;
@@ -37,7 +37,9 @@ vertical-align: top; top:40px; position: absolute; display:inline-block; padding
 .K:hover{
 	background-color: rgba(30,15,30,0.3);
 }
-
+#Titre7{
+	font-size: 12;
+}
 /*General page features*/
 
 body {
@@ -125,7 +127,7 @@ p{
     height: 100%;
     display: inline-block;
 	overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: visible;
 }
 #column1 {
     width: 20%;
@@ -180,7 +182,8 @@ table {
 	padding: 3%;
     background: rgba(30,15,30,0.1);
     margin: 2%;
-	width: 100%;
+	width: 90%;
+	white-space: initial;
 }
 .containerButtons {
     border-radius: 0px;
@@ -195,7 +198,7 @@ table {
 .containerActive {
     display: inline;
 	float: right;
-	margin-right:10%;
+	
 }
 .containerImage .caption {
     position: absolute;
@@ -215,13 +218,12 @@ table {
 	text-align: left;
 	display: none;
     position:absolute;
-	z-index: 10;	
-	margin-left: 5px;
-	margin-top: 8%;
+	margin-top: 10%;
     color:#ffffff; 
     background:#262626; 
     padding:10px; 
     border-radius:5px; 
+	z-index:10000000000;
 }
 .ActionButton {
 	border-left: 6px solid LimeGreen;
@@ -440,6 +442,7 @@ padding:0.3em;
 	width:7em;
 	margin:1em;
 	margin-top:0;
+	padding: 0.5em;
 	background-color:rgba(30,15,30,0.15);
 	border-radius:5px;
 	border:0;
@@ -449,4 +452,4 @@ padding:0.3em;
 	background-color:rgba(30,15,30,0.25);
 }
 
-
+a { color: inherit; text-decoration: inherit;} 

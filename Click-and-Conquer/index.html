@@ -12,7 +12,7 @@
 		<script src="Graphs/Chart.bundle.js"></script>
 		<script src="Graphs/samples/utils.js"></script>
 		<script src="Sweetalert/sweetalert2.min.js"></script>
-		<script src="lz-string.js"></script>
+		<script language="javascript" src="lz-string.js"></script>
 			
 	</head>
 	
@@ -23,19 +23,21 @@
 		<!-- Top-bar - Version, Save & Links -->
 		<div id="gamePage">
 			<div id="topBar">
-				<div id="gameName" class="headerButton" style="width: 250px" ><b>Click & Conquer v0.1</b></div>
+				<div class="headerButton" style="text-align: left; font-size:14;"> <a class="AA" onclick="toggleZoomPlus();"> + </a> / <a class="AA" onclick="toggleZoomMinus();"> - </a> </div>
+				<div id="gameName" class="headerButton" style="width: 200px" ><b>Click & Conquer v0.1</b></div>
 				
-				<img id="LeftImage" src="image/left.png" class="img-Planet" onclick="changePlanetMoins()">
-				<div id="changeScreenPlanet"  class="headerButton K" onclick="closeStratPage()"><b>Planet tab</b></div>
-				<img id="RightImage" src="image/right.png" class="img-Planet" onclick="changePlanetPlus()">
+				<img id="LeftImage" style="display: none" src="image/left.png" class="img-Planet" onclick="changePlanetMoins()">
+				<div id="changeScreenPlanet" style="display: none" class="headerButton K" onclick="closeStratPage()"><b>Planet tab</b></div>
+				<img id="RightImage" style="display: none" src="image/right.png" class="img-Planet" onclick="changePlanetPlus()">
 				
-				<div id="changeScreenStrat"  class="headerButton K" onclick="openStratPage()" ><b>Strategic map</b></div>
+				<div id="changeScreenStrat" style="display: none" class="headerButton K" onclick="openStratPage()" ><b>Strategic map</b></div>
 				
 				<div id="header" style="position: absolute; top:0; right:0; float:right;">
+					<div id="options" class="headerButton K" onclick="OptionsWindow()"><b>Options</b></div>
 					<div id="save" class="headerButton K" onclick="impExp()"><b>Save</b></div>
 					<div id="charts" class="headerButton K" onclick="openChartsWindow()"><b>Charts</b></div>
 					<div class="headerButton K" onclick="openAchievementsWindow()"><b>Achievements</b></div>
-					<div id="links" class="headerButton K"><b>Links</b></div>
+					<div id="wiki" class="headerButton K" onclick="toggleZoomScreen()"><b>Help</b></div>
 					
 				</div>
 			</div>
@@ -56,10 +58,10 @@
 			
 			<!-- Main page, separated in 4 columns -->
 			<div id="column1" class="column" style="vertical-align: top;">
+				
 				<div id="B1" class="containerButtons">
 					</br>
-					
-					<img src="image/USD.png" id="moneyButton" class="img" style="width:58px; left:40%; opacity:1; cursor: pointer;" onclick="planets[0].StealMoney(2500);">
+					<img src="image/USD.png" id="moneyButton" class="img" style="width:58px; left:40%; opacity:1; cursor: pointer;" onclick="planets[0].StealMoney(25);">
 					</br></br></br>
 					
 					<h3 id="Titre1"> Population 
@@ -1701,7 +1703,7 @@
 							</td>
 							<td ><span id="stealth">0</span>
 							<div class="TT1">
-								<div class="InfoBox" style="margin-left:0px">
+								<div class="InfoBox" style="margin-left:0px; min-width:200px;">
 									<p style="text-align: center;" >Stealth composition:</p>
 									<hr>
 									<div style="float:left; width:60%;">
@@ -1714,6 +1716,9 @@
 										<p id="stealthUpgrades" class="green" style="text-align: right"><i>0</i></p>
 										<p id="stealthProphets" class="green" style="text-align: center">0</p>
 									</div> 
+									<hr>
+									<p class="blue" style="text-align: right;"><i>The planet discovers you when your stealth reaches 100% </i></p>
+									<p class="blue" style="text-align: right;"><i>If so, you loose 25% of both your resources' rate and cap </i></p>
 								</div>
 							</div>
 							</td>
@@ -1809,6 +1814,7 @@
 									<p>Conq. planets: </p>
 									<p>Total dead: </p>
 									<p>Galaxy updates: </p>
+									<p><i>Stealth: </i></p>
 									<p><i>War effect: </i></p>
 								</div>
 								<div style="margin-left:60%;">
@@ -1816,6 +1822,7 @@
 									<p id="bonusRateconqPlanet" class="green" style="text-align: center"> 0 </p>
 									<p id="bonusRatetotpopDead" class="green" style="text-align: center"> 0 </p>
 									<p id="bonusRategalaxyUpdates" class="green" style="text-align: center"> 0 </p>
+									<p id="bonusRatestealthEffect" class="red" style="text-align: center">0</p>
 									<p id="bonusRatewarEffect" class="red" style="text-align: right"><i>0</i></p>
 								</div> 
 							</div>
@@ -2144,7 +2151,18 @@
 								<td ><span id="totalProphets">0</span></td>
 							</tr>
 						</table>	
-						</div>		
+						</div>	
+
+						<div class="TT ActionButtonDisabled" style="width:80%; left: 10%; display:none;" id="psychoHistory" onclick="psychoHistory();"> Research psycho-history
+							<div  id="percentagepsychoHistory" class="percentage" style="width:50%;"></div>
+							<div class="InfoBox">
+								<p style="text-align: center;" >Predictive analytical expansion tool</p>
+								<p style="text-align: center;" >Requires a total of 300 soldiers, politicians and prophets</p>
+								<hr>
+								<p style="text-align: center;" class="red" >NOT IMPLEMENTED YET</p>
+							</div>
+						</div>
+						
 					</div>	
 					
 					<div class="column" style="width:25%; min-width:300px; text-align: center;"> 
@@ -2456,6 +2474,10 @@
 						<h3 style="text-align: left" class="orange"> PLANET STATISTICS </h3>
 						<table style="min-width: 300px; width: 50%; margin: auto; position: relative;">
 							<tr>
+								<td>Current planet: </td>
+								<td ><span id="PLANETNAME">0</span></td>
+							</tr>
+							<tr>
 								<td>Time till discovery: </td>
 								<td ><span id="TIMEPLANET">0</span></td>
 							</tr>
@@ -2503,7 +2525,7 @@
 				</div>
 				
 				<div class ="column" style=" width: 50%; margin: 2%; height: 92%;">
-				<div style=" padding: 5%; text-align: center;"> <b>Achievements</b> </div>
+				<div style=" padding: 5%; text-align: center;"> <b>Achievements (<span id="nbAchievements">3</span> / 21)</b></div>
 				<div class ="column" id="myNode2" style=" width: 100%; border-radius:10px; height: 83%; background-color: rgba(30,15,30,0.1);"></div>
 				
 				</div>
@@ -2540,6 +2562,47 @@
 				<button class="saveButton" style="float:left;" onclick="document.getElementById('impexpField').select();">Select All</button>
 				<button class="saveButton" style="float:right;" onclick="load('import')">Import</button>
 			</div>
+			
+			<!-- Options tab -->
+			<div id="optionPannel" style="display:none; position: fixed; width: 60%; height: 60%; text-align: center; background-image:repeating-radial-gradient(circle, #e9e7e9, #e9e7e9 88px,#bcb7bc 88px, #d2cfd2 176px); border: 1px solid gray; top: 15%; left: 20%; border-radius: 10px;  box-shadow: 1px 1px 12px #555;">
+				<a class="closeButton" onclick="OptionsWindow()">X</a>
+				<div  class="column" style=" position: fixed; width: 26%; text-align: center; top: 20%; height: 50%; left:37%; background-color: rgb(255,255,255); border-radius: 30px;"> 
+					
+						<h4 onclick="rename();" class="AA" style="text-align: center; font-size:15;">---  Rename your civilization  ---</h4>
+						<h4 onclick="resetPlanet();" class="AA" style="text-align: center; font-size:15;">---  Reset current planet  ---</h4>
+						<h4 onclick="resetGame();" class="AA" style="text-align: center; font-size:15;">---  Completely reset game  ---</h4>
+						<h4 id="toggleAutosave" onclick="toggleAutosave();" class="AA" style="text-align: center; font-size:15;">---  Disable autosave  ---</h4>
+						</br>
+						<h4><a class="AA" style="text-align: center; font-size:15;" href="mailto:boris.jimenez.2007@gmail.com" target="_blank">---  Contact the dev  ---</a></h4>
+						<h4><a class="AA" style="text-align: center; font-size:15;" href="https://www.reddit.com/r/incremental_games/" target="_blank">---  Link to the reddit page ---</a></h4>
+						<h4 style="text-align: center; font-size:15;">---  Share the game  ---</h4>
+						
+						<div>
+							<a target="_blank" href="http://www.facebook.com/sharer.php?u=URL;t=Check+out+this+awesome+game+!">
+								<img style="height: 45px;" src="https://resource-centre.net/wp-content/plugins/html-social-share-buttons/iconset/flat/circle/Facebook.png" alt="Share This On Facebook" title="Share This On Facebook">
+							</a> 
+							<a target="_blank" href="http://twitter.com/share?url=XXX;text=Check+out+this+awesome+game+!">
+								<img style="height: 45px;" src="https://resource-centre.net/wp-content/plugins/html-social-share-buttons/iconset/flat/circle/Twitter.png" alt="Share This On Twitter" title="Share This On Twitter">
+							</a> 
+							<a target="_blank" href="https://plus.google.com/share?url=XXX">
+								<img style="height: 45px;" src="https://resource-centre.net/wp-content/plugins/html-social-share-buttons/iconset/flat/circle/Google Plus.png" alt="Share This On Google Plus" title="Share This On Google Plus">
+							</a>
+							<a target="_blank" href="mailto:?subject=Check out this awesome game !&amp;body=URL">
+								<img style="height: 45px;" src="https://resource-centre.net/wp-content/plugins/html-social-share-buttons/iconset/flat/circle/Mail.png" alt="Share This On Mail" title="Share This On Mail">
+							</a>
+						</div>
+						</br>
+						<h4 onclick="donate();" class="AA" style="text-align: center; font-size:15;">---  Donate to the dev  ---</h4>
+						
+					</ul>
+
+				
+
+					
+					
+				</div>			
+			</div>
+				
 			
 			<div id="initialPannel" style="position: fixed; width: 100%; height: 100%; left:0px;  background-color: #fff; top: 31px;"></div>
 			

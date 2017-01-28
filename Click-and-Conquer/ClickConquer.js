@@ -1,188 +1,27 @@
+// GAMEPLAY
 // Update the updates values to be consistent with the play style
-// Add a share button
-// Add a link to a reddit discussion
-// Create wikipedia page and link it to it
+// Make a galaxy fleet mechanism, which allows conquering other galaxies // TO DO MUCH LATER IN A MULTIPLAYER MODE
+
+// EASY STUFF
+// Do a rename javascript function
+// Achievement for onclick donate & share
+// Change share addresses & emails
+
+// LONG & EASY STUFF
+// Create wikipedia page
+
+// UNKNOWN DIFFICULTY
 // Put the thing online
 // Add google analytics
-// Add a stealth consequence
-// Change alignment of the play/pause buttons
-// Change alignment of the planet name
-// Check everything on several browsers
-// Pass over the code & improve it (ex: lengths...)
-
-//////////
-// SAVE //
-//////////
-
-function impExp(){
-	if (document.getElementById('impexp').style.display == 'block'){
-		document.getElementById('impexp').style.display = 'none';
-		document.getElementById('impexpField').value = '';
-	} else {
-		document.getElementById('impexp').style.display = 'block';
-	}
-}
-
-function bake_cookie(name, value) {
-	var exdate=new Date();
-	exdate.setDate(exdate.getDate() + 30);
-	var cookie = [name, '=', JSON.stringify(value),'; expires=.', exdate.toUTCString(), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
-	document.cookie = cookie;
-}
-function read_cookie(name) {
-	var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
-	result && (result = JSON.parse(result[1]));
-	return result;
-}
-function save(savetype){
-	//Create objects and populate them with the variables, these will be stored in cookies
-	//Each individual cookie stores only ~4000 characters, therefore split currently across two cookies
-	//Save files now also stored in localStorage, cookies relegated to backup
-	saveVar = {
-		gold:planets[0].resources[0].value
-	}
-	saveVar2 = {
-		science:planets[0].resources[1].value
-	}
-	//Create the cookies
-	bake_cookie('civ',saveVar);
-	bake_cookie('civ2',saveVar2);
-	//set localstorage
-	try {
-		localStorage.setItem('civ', JSON.stringify(saveVar));
-		localStorage.setItem('civ2', JSON.stringify(saveVar2));
-	} catch(err) {
-		console.log('Cannot access localStorage - browser version may be too old or storage may be corrupt')
-	}
-	//Update console for debugging, also the player depending on the type of save (manual/auto)
-	console.log('Attempted save');
-	if (savetype == 'export'){
-		var string = '[' + JSON.stringify(saveVar) + ',' + JSON.stringify(saveVar2) + ']';
-		var compressed = LZString.compressToBase64(string);
-		console.log('Compressing Save');
-		console.log('Compressed from ' + string.length + ' to ' + compressed.length + ' characters');
-		document.getElementById('impexpField').value = compressed;
-		//gameLog('Saved game and exported to base64');
-	}
-	if ((read_cookie('civ') && read_cookie('civ2')) || (localStorage.getItem('civ') && localStorage.getItem('civ2'))){
-		console.log('Savegame exists');
-		if (savetype == 'auto'){
-			console.log('Autosave');
-			//gameLog('Autosaved');
-		} else if (savetype == 'manual'){
-			//alert('Game Saved');
-			console.log('Manual Save');
-			//gameLog('Saved game');
-		}
-	};
-	try {
-		xmlhttp = new XMLHttpRequest();
-		xmlhttp.overrideMimeType('text/plain');
-		//xmlhttp.open("GET", "version.txt?r=" + Math.random(),true);
-		/*xmlhttp.onreadystatechange=function() {
-			if (xmlhttp.readyState==4) {
-				var sVersion = parseInt(xmlhttp.responseText);
-				if (version < sVersion){
-					versionAlert();
-				}
-			}
-		}*/
-		xmlhttp.send(null)
-	} catch (err) {
-		console.log('XMLHttpRequest failed')
-	}
-}
-
-function toggleAutosave(){
-	//Turns autosave on or off. Default on.
-	if (autosave == "on"){
-		console.log("Autosave toggled to off")
-		autosave = "off";
-		document.getElementById("toggleAutosave").innerHTML = "Enable Autosave"
-	} else {
-		console.log("Autosave toggled to on")
-		autosave = "on";
-		document.getElementById("toggleAutosave").innerHTML = "Disable Autosave"
-	}
-}
-
-function deleteSave(){
-	//Deletes the current savegame by setting the game's cookies to expire in the past.
-	var really = confirm('Really delete save?'); //Check the player really wanted to do that.
-	if (really){
-        document.cookie = ['civ', '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=.', window.location.host.toString()].join('');
-		document.cookie = ['civ2', '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=.', window.location.host.toString()].join('');
-		localStorage.removeItem('civ');
-		localStorage.removeItem('civ2');
-        //gameLog('Save Deleted');
-	}
-}
-
-/*function rename(){
-	//Prompts player, uses result as new civName
-	n = prompt('Please name your civilisation',civName);
-	if (n != null){
-		civName = n;
-		document.getElementById('civName').innerHTML = civName;
-	}
-}*/
+// Add paypal link & share URLs
+// Understand why the autosave does not work
+// Check graphs with loads (imports & cookies & localstorage)
+// Try to make it multiplayer & adapt the initial message to the cookies / localstorage
 
 
-function load(loadType){
-	var loadVar = {},
-		loadVar2 = {};
-		
-	if (loadType == 'cookie'){
-		//check for cookies
-		if (read_cookie('civ') && read_cookie('civ2')){
-			loadVar = read_cookie('civ');
-			loadVar2 = read_cookie('civ2');
-			//gameLog('Loaded saved game from cookie');
-			//gameLog('Save system switching to localStorage.');
-		} else {
-			console.log('Unable to find cookie');
-			return false;
-		};
-	}
-	
-	if (loadType == 'localStorage'){
-		//check for local storage
-		try {
-			string1 = localStorage.getItem('civ');
-			string2 = localStorage.getItem('civ2');
-		} catch(err) {
-			console.log('Cannot access localStorage - browser may not support localStorage, or storage may be corrupt')
-		}
-		if (string1 && string2){
-			loadVar = JSON.parse(string1);
-			loadVar2 = JSON.parse(string2);
-			//gameLog('Loaded saved game from localStorage')
-		} else {
-			console.log('Unable to find variables in localStorage. Attempting to load cookie')
-			load('cookie');
-			return false;
-		}
-	}
-	
-	if (loadType == 'import'){
-		//take the import string, decompress and parse it
-		var compressed = document.getElementById('impexpField').value;
-		var decompressed = LZString.decompressFromBase64(compressed);
-		var revived = JSON.parse(decompressed);
-		//set variables to load from
-		loadVar = revived[0];
-		loadVar2 = revived[1];
-		//gameLog('Imported saved game');
-		//close import/export dialog
-	}
-}
-
-load('localStorage');
-
-
-/////////////////////
-// INPUT VARIABLES //
-/////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// INPUT VARIABLES ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var Time=0;
 var play=false;
@@ -202,18 +41,26 @@ var users=[];
 var userName="";
 var numUser="";
 var civilizationScore=0;
-var LENGTH=0;
 var activeUsersNb=0;
 var totalSoldiers=0;
 var totalPoliticians=0;
 var totalProphets=0;
-
-
-////////////
-// GALAXY //
-////////////
-
-// Galaxy resources
+var timerClick=100;
+var biggerTimerClick=3600;
+var numClickPrevious=0;
+var autosaveCounter = 0;
+var autosave="on";
+var ctx = [];
+var canvas=[];
+var configChart=[];
+var resourcesChart=[];
+var statusChart=[];
+var popChart=[];
+var winChart=[];
+var dataCap=[];
+var dataRate=[];
+var dataValue=[];
+var ZOOM=100;
 
 var galaxyResources=[
 	ships={
@@ -301,14 +148,643 @@ var galaxyTechno={
 		percentageBuyable:0		
 	}
 };
+
+var Achievements = {
+	jobInterview: {name: "Job interview", condition: "Recruit someone", reached: false},
+	cesar: {name: "Ave, Cesar", condition: "Conquer a planet by any mean", reached: false},
+	trump: {name: "Donald Trump", condition: "Conquer a planet through politics", reached: false},
+	rael: {name: "Hallelujah", condition: "Conquer a planet through religion", reached: false},
+	putin: {name: "Vladimir Putin", condition: "Conquer a planet through military power", reached: false},
+	hillary: {name: "Hillary Clinton", condition: "Loose a planet", reached: false},
+	napoleon: {name: "Napoleon", condition: "Conquer 10 planets", reached: false},
+	pauliac : {name: "F. Pauliac", condition: "Build a ship", reached: false},
+	gates: {name: "Bill Gates", condition: "Reach 1 M$", reached: false},
+	kabila: {name: "Kabila", condition: "Have 30 politicians or more on a planet", reached: false},
+	jesus: {name: "Jesus", condition: "Have 30 prophets or more on a planet", reached: false},
+	bonus: {name: "A. Estanislao", condition: "Reach a bonus rate of 100%", reached: false},
+	cap: {name: "Uncle Scrooge", condition: "Double the resources' cap", reached: false},
+	khan: {name: "Gengis Khan", condition: "More than 100 deaths", reached: false},
+	addict: {name: "Addict", condition: "Play for more than 10 days", reached: false},
+	beginner: {name: "Way to go", condition: "Play for more than 2 hours", reached: false},
+	pandora: {name: "Pandora", condition: "Reach 42 unobtainium", reached: false},
+	click:{name: "Just. One. More.", condition: "5181 clicks", reached: false},
+	thankyou:{name: "Thank you !", condition: "Share this game", reached: false}, // TO DO 
+	goldstar:{name: "Reddit gold", condition: "Contribute to the game development", reached: false}, // TO DO 
+	ELI5:{name: "ELI5", condition: "Research all updates on Earth", reached: false},
+	CivVI:{name: "Civilization VI", condition: "Reach a civilization score of 1000", reached:false}
+};
+var LENGTH=0;
+
+// Initialization of the game
+// Source of the planets name & charact : https://en.wikipedia.org/wiki/List_of_Foundation_universe_planets
+function initialConfig(){
+	discoverPlanet('Earth', 'image/planet/i.jpg',30,30,40,7500000000,149000000,75000000000000,'Temperate','Democracy',3,100);
+	discoverPlanet('Comporellon', 'image/planet/d.jpg',40,50,10,2500000,10000000,40000000000,'Polar','Autoritarism',3,90);
+	discoverPlanet('Aurora', 'image/planet/l.jpg',50,100,40,200000000,25000000,11000000000000,'Harsh','Totalitarism',4,80);
+	discoverPlanet('Vega', 'image/planet/q.jpg',12,20,50,1500000000,55000000,7500000000000,'Grassland','Autoritarism',4,60);
+	discoverPlanet('Euterpe', 'image/planet/e.jpg',10,25,70,780000000,31000000,46000000000000,'Equatorial','Totalitarism',3,50);
+	discoverPlanet('Hesperos', 'image/planet/g.jpg',5,5,5,7200000,250000,150000000000,'Temperate','Totalitarism',2,40);
+	discoverPlanet('Solaria', 'image/planet/m.jpg',2,50,0,20000,7800,1200000000,'Arid','Theocracy',4,30);
+	discoverPlanet('Alpha', 'image/planet/j.jpg',250,5,5,2000000,15000,32000000000,'Maritime','Democracy',4,20);
+	discoverPlanet('Helicon', 'image/planet/r.jpg',3,15,72,2000000,7520000,2000000000,'Temperate','Theocracy',2,10);
+	discoverPlanet('Arcturus', 'image/planet/c.jpg',10,120,35,7500000000,2500000000,75000000000000,'Temperate','Totalitarism',2,0);
+	discoverPlanet('Derowd', 'image/planet/k.jpg',5,5,250,780000000,31000000,4000000000,'Dry','Democracy',1,0);
+	discoverPlanet('Eos', 'image/planet/h.jpg',100,4,45,2500000,7520000000,10000000000,'Ice cap','Totalitarism',4,0);
+	discoverPlanet('Kalgan', 'image/planet/p.jpg',72,200,180,120000000000,550000000,110000000000000000,'Semi-tropical','Totalitarism',4,0);
+	discoverPlanet('Terminus', 'image/planet/b.jpg',250,75,75,10200000000,55000000,7500000000000000,'Tropical','Democracy',4,0);
+	discoverPlanet('Trantor', 'image/planet/o.jpg',50,60,220,15000000000,194000000,850000000000000,'Humid continental','Autoritarism',4,0);
+	discoverPlanet('Gaia', 'image/planet/p.jpg',500,500,500,1000000000,10000000,100000000000,'Continental','Theocracy',1,0);
+	discoverPlanet('Gamma', 'image/planet/a.jpg',5,5,5,10000000,10000000,85000000000,'Lunar','Totalitarism',2,0);
 	
-// Galaxy update functions
+	LENGTH=planets.length;
+	planets[0].Revealled=true;
+	planets[0].Active=true;
+	for (var i=0;i<LENGTH;i++){
+		planets[i].calculateMainGameResources();
+	};
+	planets[0].Initialize();
+	updateGameResources();
+	updateGameButtons();
+	updateMainPlanetData();
+};
+
+initialConfig();
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RESET ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function resetPlanet(){
+	for (var i=0; i<LENGTH; i++){
+		if (planets[i].Active){
+			swal({
+				title: "Are you really sure?",
+				html: "You are about to RESET ALL DATA & PROGRESS on planet "+planets[i].Name+". </br></br>You will keep your achievements and your data on other planets.</br></br>We advise you to keep an exported save before.</br></br>Do you want to proceed ?",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Yes, let's erase "+planets[i].Name,
+				cancelButtonText: "Nope, just kidding",
+				width: 800
+			}).then(function () {
+				planets[i].discoveryChance=planets[i].discoveryChanceInit;
+				planets[i].popPlanet=[1000000,planets[i].Scientists, planets[i].Soldiers, planets[i].Politicians,1000000,1000000,1000000,1000000];
+				planets[i].Population=planets[i].PopulationInit;
+				planets[i].War=false;
+				planets[i].warTimer=0;
+				planets[i].WarEffect=1;
+				planets[i].Revealled=true;
+				planets[i].Controlled=false;
+				planets[i].Lost=false;
+				planets[i].Active=true;
+				planets[i].timeCount=0;
+				for (var j=0;j<4;j++){
+					planets[i].resources[j].value=0;
+				};
+				var cost=[
+					[5000,0,0,0],
+					[10000,1000,0,0],
+					[10000,0,1000,0],
+					[50000,0,10000,0],
+					[10000,0,0,1000],
+					[15000,15000,15000,15000],
+					[10000,0,0,50000],
+					[100000,100000,100000,100000]
+				];
+				for (var j=0;j<planets[i].pop.length;j++){
+					planets[i].pop[j].value=0;
+					planets[i].pop[j].cost=cost[i];
+				};
+				planets[i].recruitScientistRate=0;
+				planets[i].recruitSoldierRate=0;
+				planets[i].recruitPoliticianRate=0;
+				planets[i].recruitGuruRate=0;
+				planets[i].recruitScientistNumber=0;
+				planets[i].recruitSoldierNumber=0;
+				planets[i].recruitGuruNumber=0;
+				planets[i].recruitPoliticianNumber=0;
+				planets[i].pop[7].valueFree=0;
+				planets[i].totalPopulation=0;
+					
+				for (Techno in planets[i].techno){
+					planets[i].techno[Techno].effect=0;
+				};
+		
+				planets[i].Revealled=true;
+				planets[i].Active=true;
+				planets[i].calculateMainGameResources();
+				planets[i].Initialize();
+				updateGameResources();
+				updateGameButtons();
+				updateMainPlanetData();
+				log(planets[i].Name,"A new beginning on "+planets[i].Name,"black");
+			});
+			break;
+		};
+	};
+};
+
+function resetGame(){
+	swal({
+		title: "Are you really sure?",
+		html: "You are about to RESET THE GAME and DELETE ALL YOUR DATA. </br></br>You will not keep any data, including your achievements.</br></br>We strongly advise you to keep an exported save before.</br></br>Do you want to proceed ?",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes, I want to RESET",
+		cancelButtonText: "Nope, just kidding",
+		width: 800
+	}).then(function () {
+		Time=0;
+		play=false;
+		planets=[];
+		timeBetweenEvents1=60;
+		timeBetweenEvents2=60;
+		timeBetweenEvents3=60;
+		datasets=[];
+		limitsRadar=[1,1,1,1,1,1,1];
+		numClick=0;
+		SHIPS=0;
+		PLANETSLOST=0;
+		NUMPEOPLE=0;
+		YearsREALLYPLAYED=0;
+		totalSoldiers=0;
+		totalPoliticians=0;
+		totalProphets=0;
+		for (var Achievement in Achievements){
+			Achievements[Achievement].reached=false;
+		};
+		initialConfig();
+		log("", "Game reset, all game data lost","red");
+		Play();
+	});
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// LOAD & SAVE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function impExp(){
+	if (document.getElementById('impexp').style.display == 'block'){
+		document.getElementById('impexp').style.display = 'none';
+		document.getElementById('impexpField').value = '';
+	} else {
+		document.getElementById('impexp').style.display = 'block';
+	}
+}
+function bake_cookie(name, value) {
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate() + 30);
+	var cookie = [name, '=', JSON.stringify(value),'; expires=.', exdate.toUTCString(), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
+	// check here : http://www.javascripter.net/faq/readingacookie.htm
+	document.cookie = cookie;
+}
+function read_cookie(name) {
+	var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+	result && (result = JSON.parse(result[1]));
+	return result;
+}
+function save(savetype){
+
+	saveVarGalaxy = {
+		ZOOM:ZOOM,
+		NUMPEOPLE:NUMPEOPLE,
+		SHIPS:SHIPS,
+		numClick:numClick,
+		PLANETSLOST:PLANETSLOST,
+		Time:Time,
+		timeBetweenEvents1:timeBetweenEvents1,
+		timeBetweenEvents2:timeBetweenEvents2,
+		timeBetweenEvents3:timeBetweenEvents3,
+		YearsREALLYPLAYED:YearsREALLYPLAYED,
+		userName:userName,
+		galaxyResources:[galaxyResources[0].value,galaxyResources[1].value,galaxyResources[2].value,galaxyResources[3].value],
+		autosave:autosave,
+		propulsion: [galaxyTechno.propulsion.cost, galaxyTechno.propulsion.value],
+		orbitalSupport: [galaxyTechno.orbitalSupport.cost, galaxyTechno.orbitalSupport.value],
+		intergalacticTrade: [galaxyTechno.intergalacticTrade.cost, galaxyTechno.intergalacticTrade.value],
+		cargoShip: [galaxyTechno.cargoShip.cost, galaxyTechno.cargoShip.value],
+		solarPanel: [galaxyTechno.solarPanel.cost, galaxyTechno.solarPanel.value],
+		miningVessel: [galaxyTechno.miningVessel.cost, galaxyTechno.miningVessel.value],
+		terraformingBeam: [galaxyTechno.terraformingBeam.cost, galaxyTechno.terraformingBeam.value],
+		spaceX: [galaxyTechno.spaceX.cost, galaxyTechno.spaceX.value]
+	};
+	
+	saveAchievements = {
+		jobInterview:Achievements.jobInterview.reached,
+		cesar:Achievements.cesar.reached,
+		trump:Achievements.trump.reached,
+		rael:Achievements.rael.reached,
+		putin:Achievements.putin.reached,
+		hillary:Achievements.hillary.reached,
+		napoleon:Achievements.napoleon.reached,
+		pauliac:Achievements.pauliac.reached,
+		gates:Achievements.gates.reached,
+		kabila:Achievements.kabila.reached,
+		jesus:Achievements.jesus.reached,
+		bonus:Achievements.bonus.reached,
+		cap:Achievements.cap.reached,
+		khan:Achievements.khan.reached,
+		addict:Achievements.addict.reached,
+		beginner:Achievements.beginner.reached,
+		pandora:Achievements.pandora.reached,
+		click:Achievements.click.reached,
+		thankyou:Achievements.thankyou.reached,
+		goldstar:Achievements.goldstar.reached,
+		ELI5:Achievements.ELI5.reached,
+		CivVI:Achievements.CivVI.reached,
+	};
+	
+	var savevarPlanetsData=[];
+	var savevarPlanetsTechno=[];
+	
+	for (var i=0;i<LENGTH;i++){
+		
+		savevarPlanetsData[i] = {
+			discoveryChance: planets[i].discoveryChance,
+			popPlanet: planets[i].popPlanet,
+			Population: planets[i].Population,
+			War: planets[i].War,
+			warTimer: planets[i].warTimer,
+			WarEffect: planets[i].WarEffect,
+			Revealled: planets[i].Revealled,
+			Controlled: planets[i].Controlled,
+			Lost: planets[i].Lost,
+			Active: planets[i].Active,
+			timeCount: planets[i].timeCount,
+			TIMEPLANET: planets[i].TIMEPLANET,
+			SHIPSPLANET: planets[i].SHIPSPLANET,
+			resources:[planets[i].resources[0].value,planets[i].resources[1].value,planets[i].resources[2].value,planets[i].resources[3].value],
+			popValue:[planets[i].pop[0].value,planets[i].pop[1].value,planets[i].pop[2].value,planets[i].pop[3].value,planets[i].pop[4].value,planets[i].pop[5].value,planets[i].pop[6].value,planets[i].pop[7].value],
+			popCost:[planets[i].pop[0].cost,planets[i].pop[1].cost,planets[i].pop[2].cost,planets[i].pop[3].cost,planets[i].pop[4].cost,planets[i].pop[5].cost,planets[i].pop[6].cost,planets[i].pop[7].cost],
+			recruitScientistRate: planets[i].recruitScientistRate,
+			recruitSoldierRate: planets[i].recruitSoldierRate,
+			recruitPoliticianRate: planets[i].recruitPoliticianRate,
+			recruitGuruRate: planets[i].recruitGuruRate,
+			recruitScientistNumber: planets[i].recruitScientistNumber,
+			recruitSoldierNumber: planets[i].recruitSoldierNumber,
+			recruitGuruNumber: planets[i].recruitGuruNumber,
+			recruitPoliticianNumber: planets[i].recruitPoliticianNumber,
+			recruitvalueFree: planets[i].pop[7].valueFree,
+			populationDead: planets[i].populationDead,
+			totalPopulation: planets[i].totalPopulation
+		};
+		
+		savevarPlanetsTechno[i] = {
+			pickpocketTraining: planets[i].techno.pickpocketTraining.effect,
+			drugLab: planets[i].techno.drugLab.effect,
+			armedRobbery: planets[i].techno.armedRobbery.effect,
+			mortgageFund: planets[i].techno.mortgageFund.effect,
+			IA: planets[i].techno.IA.effect,
+			automation: planets[i].techno.automation.effect,
+			hoursWeek: planets[i].techno.hoursWeek.effect,
+			underpaidIntern: planets[i].techno.underpaidIntern.effect,
+			mercenaries: planets[i].techno.mercenaries.effect,
+			warChild: planets[i].techno.warChild.effect,
+			drones: planets[i].techno.drones.effect,
+			cyberAttack: planets[i].techno.cyberAttack.effect,
+			createCult: planets[i].techno.createCult.effect,
+			weeklyMeetings: planets[i].techno.weeklyMeetings.effect,
+			area51: planets[i].techno.area51.effect,
+			pacificIsland: planets[i].techno.pacificIsland.effect,
+			darkSideOfTheMoon: planets[i].techno.darkSideOfTheMoon.effect,
+			wallStreet: planets[i].techno.wallStreet.effect,
+			taxHeavens: planets[i].techno.taxHeavens.effect,
+			internet: planets[i].techno.internet.effect,
+			wikipedia: planets[i].techno.wikipedia.effect,
+			badNeighborhood: planets[i].techno.badNeighborhood.effect,
+			submarine: planets[i].techno.submarine.effect,
+			buildPyramids: planets[i].techno.buildPyramids.effect,
+			knife: planets[i].techno.knife.effect,
+			machineGun: planets[i].techno.machineGun.effect,
+			ballisticMissile: planets[i].techno.ballisticMissile.effect,
+			nanovirus: planets[i].techno.nanovirus.effect,
+			holligans: planets[i].techno.holligans.effect,
+			facebook: planets[i].techno.facebook.effect,
+			flatEarthTheory: planets[i].techno.flatEarthTheory.effect,
+			candyCrush: planets[i].techno.candyCrush.effect,
+			writeHollyBook: planets[i].techno.writeHollyBook.effect,
+			humanSacrifice: planets[i].techno.humanSacrifice.effect,
+			wololo: planets[i].techno.wololo.effect,
+			inquisition: planets[i].techno.inquisition.effect,
+			microphone: planets[i].techno.microphone.effect,
+			politicalParty: planets[i].techno.politicalParty.effect,
+			massMedia: planets[i].techno.massMedia.effect,
+			makeAmerica: planets[i].techno.makeAmerica.effect,
+			blackmail: planets[i].techno.blackmail.effect,
+			HRManagement: planets[i].techno.HRManagement.effect,
+			oilIndustry: planets[i].techno.oilIndustry.effect,
+			fuckImOuttaHere: planets[i].techno.fuckImOuttaHere.effect
+		}
+		bake_cookie('cookie10'+i,savevarPlanetsData[i]);
+		bake_cookie('cookie20'+i,savevarPlanetsTechno[i]);
+	}
+	bake_cookie('cookie1',saveVarGalaxy);
+	bake_cookie('cookie2',saveAchievements);
+	
+	//set localstorage
+	try {
+		localStorage.setItem('cookie1', JSON.stringify(saveVarGalaxy));
+		localStorage.setItem('cookie2', JSON.stringify(saveAchievements));
+		for (var i=0;i<LENGTH;i++){
+			localStorage.setItem('cookie10'+i, JSON.stringify(savevarPlanetsData[i]));
+			localStorage.setItem('cookie20'+i, JSON.stringify(savevarPlanetsTechno[i]));
+		};
+		
+	} catch(err) {
+		console.log('Cannot access localStorage - browser version may be too old or storage may be corrupt')
+	}
+	console.log('Attempted save');
+	if (savetype == 'export'){
+		var string = '[' + JSON.stringify(saveVarGalaxy) + ',' + JSON.stringify(saveAchievements);
+		for (var i=0;i<LENGTH;i++){
+			string+=','+JSON.stringify(savevarPlanetsData[i]) + ',' + JSON.stringify(savevarPlanetsTechno[i]);
+		};
+		string+= ']';
+		var compressed = LZString.compressToBase64(string);
+		console.log('Compressing Save');
+		console.log('Compressed from ' + string.length + ' to ' + compressed.length + ' characters');
+		document.getElementById('impexpField').value = compressed;
+		log("",'Game data compressed and exported',"black");
+	};
+	var testCookieRead = read_cookie('cookie1') && read_cookie('cookie2');
+	var testCookieStorage = read_cookie('cookie1') && read_cookie('cookie2');
+	for (var i=0;i<LENGTH;i++){
+		testCookieRead = testCookieRead && read_cookie('cookie10'+i) && read_cookie('cookie20'+i);
+		testCookieStorage = testCookieStorage && localStorage.getItem('cookie10'+i) && localStorage.getItem('cookie20'+i);
+	};
+	if (testCookieRead || testCookieStorage){    
+		console.log('Savegame exists');
+		if (savetype == 'auto'){
+			console.log('Autosave');
+			log("",'Autosave',"blacked");
+		} else if (savetype == 'manual'){
+			log("",'Game Saved',"black");
+			console.log('Manual Save');
+		}
+	};
+	try {
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.overrideMimeType('text/plain');
+		xmlhttp.open("GET", "version.txt?r=" + Math.random(),true);
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4) {
+				var sVersion = parseInt(xmlhttp.responseText);
+				if (version < sVersion){
+					versionAlert();
+				}
+			}
+		}
+		xmlhttp.send(null)
+	} catch (err) {
+		console.log('XMLHttpRequest failed')
+	}
+}
+
+function toggleAutosave(){
+	if (autosave == "on"){
+		autosave = "off";
+		document.getElementById("toggleAutosave").innerHTML = "---  Enable Autosave  ---"
+	} else {
+		autosave = "on";
+		document.getElementById("toggleAutosave").innerHTML = "---  Disable Autosave  ---"
+	}
+}
+
+function load(loadType){
+	clearLog();
+	var loadVar1 = {};
+	var loadVar2 = {};
+	var loadVar10=[];
+	var loadVar20=[];
+	for (var i=0;i<LENGTH;i++){
+		loadVar10[i]={};
+		loadVar20[i]={};
+	}
+		
+	if (loadType == 'cookie'){
+		var cookieIsGood=read_cookie('cookie1') && read_cookie('cookie2');
+		for (var i=0;i<LENGTH;i++){
+			cookieIsGood = cookieIsGood && read_cookie('cookie10'+i) && read_cookie('cookie20'+i);
+		};
+		if (cookieIsGood){
+			loadVar1 = read_cookie('cookie1');
+			loadVar2 = read_cookie('cookie2');
+			for (var i=0;i<LENGTH;i++){
+				loadVar10[i]=read_cookie('cookie10'+i);
+				loadVar20[i]=read_cookie('cookie20'+i);
+			};
+			log("",'Loaded saved game from cookie',"black");
+		} else {
+			console.log('Unable to find cookie or corrupt cookie');
+			return false;
+		};
+	}
+	
+	if (loadType == 'localStorage'){
+		/*try {
+			var string10=[];
+			var string20=[];
+			var string1 = localStorage.getItem('cookie1');
+			var string2 = localStorage.getItem('cookie2');
+			var localStorageIsGood=string1 && string2;
+			for (var i=0;i<LENGTH;i++){
+				string10[i]=localStorage.getItem('cookie10'+i);
+				string20[i]=localStorage.getItem('cookie20'+i);
+				localStorageIsGood=localStorageIsGood && string10[i] && string20[i];
+			};
+		} catch(err) {
+			console.log('Cannot access localStorage - browser may not support localStorage, or storage may be corrupt')
+		}
+		if (localStorageIsGood){
+			loadVar1 = JSON.parse(string1);
+			loadVar2 = JSON.parse(string2);
+			for (var i=0;i<LENGTH;i++){
+				loadVar10[i]=JSON.parse(string10[i]);
+				loadVar20[i]=JSON.parse(string20[i]);
+			};
+			log("",'Loaded saved game from localStorage',"black");
+		} else {*/
+			console.log('Unable to find variables in localStorage. Attempting to load cookie');
+			load('cookie');
+			return false;
+		//}
+	}
+	
+	if (loadType == 'import'){
+		var compressed = document.getElementById('impexpField').value;
+		var decompressed = LZString.decompressFromBase64(compressed);
+		var revived = JSON.parse(decompressed);
+
+		loadVar1 = revived[0];
+		loadVar2 = revived[1];
+		for (var i=0;i<LENGTH;i++){
+			loadVar10[i]=revived[2+2*i];
+			loadVar20[i]=revived[2+2*i+1];
+		};
+		log("",'Saved game imported successfully',"black");
+		impExp();
+	}
+	
+	// Update all variables back
+	ZOOM=loadVar1.ZOOM; document.body.style.zoom=ZOOM+"%";
+	NUMPEOPLE=loadVar1.NUMPEOPLE;
+	SHIPS=loadVar1.SHIPS;
+	numClick=loadVar1.numClick;
+	PLANETSLOST=loadVar1.PLANETSLOST;
+	Time=loadVar1.Time;
+	timeBetweenEvents1=loadVar1.timeBetweenEvents1;
+	timeBetweenEvents2=loadVar1.timeBetweenEvents2;
+	timeBetweenEvents3=loadVar1.timeBetweenEvents3;
+	YearsREALLYPLAYED=loadVar1.YearsREALLYPLAYED;
+	userName=loadVar1.userName;
+	for (var i=0; i<4; i++){
+		galaxyResources[i].value=loadVar1.galaxyResources[i];
+	};
+	autosave=loadVar1.autosave;
+	galaxyTechno.propulsion.cost=loadVar1.propulsion[0];
+	galaxyTechno.propulsion.value=loadVar1.propulsion[1];
+	galaxyTechno.orbitalSupport.cost=loadVar1.orbitalSupport[0];
+	galaxyTechno.orbitalSupport.value=loadVar1.orbitalSupport[1];
+	galaxyTechno.intergalacticTrade.cost=loadVar1.intergalacticTrade[0];
+	galaxyTechno.intergalacticTrade.value=loadVar1.intergalacticTrade[1];
+	galaxyTechno.cargoShip.cost=loadVar1.cargoShip[0];
+	galaxyTechno.cargoShip.value=loadVar1.cargoShip[1];
+	galaxyTechno.solarPanel.cost=loadVar1.solarPanel[0];
+	galaxyTechno.solarPanel.value=loadVar1.solarPanel[1];
+	galaxyTechno.miningVessel.cost=loadVar1.miningVessel[0];
+	galaxyTechno.miningVessel.value=loadVar1.miningVessel[1];
+	galaxyTechno.terraformingBeam.cost=loadVar1.terraformingBeam[0];
+	galaxyTechno.terraformingBeam.value=loadVar1.terraformingBeam[1];
+	galaxyTechno.spaceX.cost=loadVar1.spaceX[0];
+	galaxyTechno.spaceX.value=loadVar1.spaceX[1];
+	
+	Achievements.jobInterview.reached=loadVar2.jobInterview;
+	Achievements.cesar.reached=loadVar2.cesar;
+	Achievements.trump.reached=loadVar2.trump;
+	Achievements.rael.reached=loadVar2.rael;
+	Achievements.putin.reached=loadVar2.putin;
+	Achievements.hillary.reached=loadVar2.hillary;
+	Achievements.napoleon.reached=loadVar2.napoleon;
+	Achievements.pauliac.reached=loadVar2.pauliac;
+	Achievements.gates.reached=loadVar2.gates;
+	Achievements.kabila.reached=loadVar2.kabila;
+	Achievements.jesus.reached=loadVar2.jesus;
+	Achievements.bonus.reached=loadVar2.bonus;
+	Achievements.cap.reached=loadVar2.cap;
+	Achievements.khan.reached=loadVar2.khan;
+	Achievements.addict.reached=loadVar2.addict;
+	Achievements.beginner.reached=loadVar2.beginner;
+	Achievements.pandora.reached=loadVar2.pandora;
+	Achievements.click.reached=loadVar2.click;
+	Achievements.thankyou.reached=loadVar2.thankyou;
+	Achievements.goldstar.reached=loadVar2.goldstar;
+	Achievements.ELI5.reached=loadVar2.ELI5;
+	Achievements.CivVI.reached=loadVar2.CivVI;
+	
+	for (var i=0;i<LENGTH;i++){
+		planets[i].discoveryChance=loadVar10[i].discoveryChance;
+		planets[i].popPlanet=loadVar10[i].popPlanet;
+		planets[i].Population=loadVar10[i].Population;
+		planets[i].War=loadVar10[i].War;
+		planets[i].warTimer=loadVar10[i].warTimer;
+		planets[i].WarEffect=loadVar10[i].WarEffect;
+		planets[i].Revealled=loadVar10[i].Revealled;
+		planets[i].Controlled=loadVar10[i].Controlled;
+		planets[i].Lost=loadVar10[i].Lost;
+		planets[i].Active=loadVar10[i].Active;
+		planets[i].timeCount=loadVar10[i].timeCount;
+		planets[i].TIMEPLANET=loadVar10[i].TIMEPLANET;
+		planets[i].SHIPSPLANET=loadVar10[i].SHIPSPLANET;
+		for (var j=0;j<4;j++){
+			planets[i].resources[j].value=loadVar10[i].resources[j];
+		};
+		for (var j=0;j<planets[i].pop.length;j++){
+			planets[i].pop[j].value=loadVar10[i].popValue[j];
+			planets[i].pop[j].cost=loadVar10[i].popCost[j];
+		};
+		planets[i].recruitScientistRate=loadVar10[i].recruitScientistRate;
+		planets[i].recruitSoldierRate=loadVar10[i].recruitSoldierRate;
+		planets[i].recruitPoliticianRate=loadVar10[i].recruitPoliticianRate;
+		planets[i].recruitGuruRate=loadVar10[i].recruitGuruRate;
+		planets[i].recruitScientistNumber=loadVar10[i].recruitScientistNumber;
+		planets[i].recruitSoldierNumber=loadVar10[i].recruitSoldierNumber;
+		planets[i].recruitGuruNumber=loadVar10[i].recruitGuruNumber;
+		planets[i].recruitPoliticianNumber=loadVar10[i].recruitPoliticianNumber;
+		planets[i].pop[7].valueFree=loadVar10[i].recruitvalueFree;
+		planets[i].populationDead=loadVar10[i].populationDead;
+		planets[i].totalPopulation=loadVar10[i].totalPopulation;
+		
+		planets[i].techno.pickpocketTraining.effect=loadVar20[i].pickpocketTraining;
+		planets[i].techno.drugLab.effect=loadVar20[i].drugLab;
+		planets[i].techno.armedRobbery.effect=loadVar20[i].armedRobbery;
+		planets[i].techno.mortgageFund.effect=loadVar20[i].mortgageFund;
+		planets[i].techno.IA.effect=loadVar20[i].IA;
+		planets[i].techno.automation.effect=loadVar20[i].automation;
+		planets[i].techno.hoursWeek.effect=loadVar20[i].hoursWeek;
+		planets[i].techno.underpaidIntern.effect=loadVar20[i].underpaidIntern;
+		planets[i].techno.mercenaries.effect=loadVar20[i].mercenaries;
+		planets[i].techno.warChild.effect=loadVar20[i].warChild;
+		planets[i].techno.drones.effect=loadVar20[i].drones;
+		planets[i].techno.cyberAttack.effect=loadVar20[i].cyberAttack;
+		planets[i].techno.createCult.effect=loadVar20[i].createCult;
+		planets[i].techno.weeklyMeetings.effect=loadVar20[i].weeklyMeetings;
+		planets[i].techno.area51.effect=loadVar20[i].area51;
+		planets[i].techno.pacificIsland.effect=loadVar20[i].pacificIsland;
+		planets[i].techno.darkSideOfTheMoon.effect=loadVar20[i].darkSideOfTheMoon;
+		planets[i].techno.wallStreet.effect=loadVar20[i].wallStreet;
+		planets[i].techno.taxHeavens.effect=loadVar20[i].taxHeavens;
+		planets[i].techno.internet.effect=loadVar20[i].internet;
+		planets[i].techno.wikipedia.effect=loadVar20[i].wikipedia;
+		planets[i].techno.badNeighborhood.effect=loadVar20[i].badNeighborhood;
+		planets[i].techno.submarine.effect=loadVar20[i].submarine;
+		planets[i].techno.buildPyramids.effect=loadVar20[i].buildPyramids;
+		planets[i].techno.knife.effect=loadVar20[i].knife;
+		planets[i].techno.machineGun.effect=loadVar20[i].machineGun;
+		planets[i].techno.ballisticMissile.effect=loadVar20[i].ballisticMissile;
+		planets[i].techno.nanovirus.effect=loadVar20[i].nanovirus;
+		planets[i].techno.holligans.effect=loadVar20[i].holligans;
+		planets[i].techno.facebook.effect=loadVar20[i].facebook;
+		planets[i].techno.flatEarthTheory.effect=loadVar20[i].flatEarthTheory;
+		planets[i].techno.candyCrush.effect=loadVar20[i].candyCrush;
+		planets[i].techno.writeHollyBook.effect=loadVar20[i].writeHollyBook;
+		planets[i].techno.humanSacrifice.effect=loadVar20[i].humanSacrifice;
+		planets[i].techno.wololo.effect=loadVar20[i].wololo;
+		planets[i].techno.inquisition.effect=loadVar20[i].inquisition;
+		planets[i].techno.microphone.effect=loadVar20[i].microphone;
+		planets[i].techno.politicalParty.effect=loadVar20[i].politicalParty;
+		planets[i].techno.massMedia.effect=loadVar20[i].massMedia;
+		planets[i].techno.makeAmerica.effect=loadVar20[i].makeAmerica;
+		planets[i].techno.blackmail.effect=loadVar20[i].blackmail;
+		planets[i].techno.HRManagement.effect=loadVar20[i].HRManagement;
+		planets[i].techno.oilIndustry.effect=loadVar20[i].oilIndustry;
+		planets[i].techno.fuckImOuttaHere.effect=loadVar20[i].fuckImOuttaHere;
+	};
+	
+	for (var i=0; i<LENGTH;i++){
+		planets[i].calculateMainGameResources();
+		if (planets[i].Active){
+			planets[i].Initialize();
+		};
+	};
+	updateGameResources();
+	updateGameButtons();
+	updateMainPlanetData();	
+	
+};
+
+load('localStorage');
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GALAXY ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function updateGalaxyResources(){
 	totalSoldiers=0;
 	totalPoliticians=0;
 	totalProphets=0;
-	for (var Nb=0;Nb<planets.length;Nb++){
+	for (var Nb=0;Nb<LENGTH;Nb++){
 		totalSoldiers+=planets[Nb].pop[2].value;
 		totalPoliticians+=planets[Nb].pop[3].value;
 		totalProphets+=planets[Nb].pop[6].value;
@@ -316,8 +792,7 @@ function updateGalaxyResources(){
 	for (var Techno in galaxyTechno){
 		calculatePercentage(Techno);
 	};
-	
-	for (var Nb=0;Nb<planets.length;Nb++){
+	for (var Nb=0;Nb<LENGTH;Nb++){
 		planets[Nb].discoveryChance=Math.min(100,planets[Nb].discoveryChanceInit+galaxyTechno.propulsion.value*10);
 		if (!planets[Nb].Revealled && planets[Nb].timeCount===0){ 
 			document.getElementById('ImagePlanetGalaxy'+Nb).innerHTML="<div class='bubble'><p style='color:black; top: 50px;'>Discovery chance:</p></br><p class='textPlanet'>"+planets[Nb].discoveryChance+"%</p></div>";
@@ -326,17 +801,20 @@ function updateGalaxyResources(){
 };
 
 function updateGalaxyButtons(){
-	
 	UpdateValue("ships",galaxyResources[0].value,0);
 	for (var i=1;i<4;i++){
 		UpdateValue(galaxyResources[i].name,galaxyResources[i].value,1);
 		UpdateValue(galaxyResources[i].name+"Cap",galaxyResources[i].cap,1);
 		UpdateValue(galaxyResources[i].name+"Rate",galaxyResources[i].rate,1);
 	};
-	
 	UpdateValue("totalSoldiers",totalSoldiers,0);
 	UpdateValue("totalPoliticians",totalPoliticians,0);
 	UpdateValue("totalProphets",totalProphets,0);
+	
+	var pop=totalSoldiers+totalPoliticians+totalProphets;
+	if (pop>0){ document.getElementById("psychoHistory").style.display= 'block';};
+	if (pop<300) {document.getElementById("percentagepsychoHistory").style.width=100*pop/300+"%";};
+	UpdateButton(pop>=300,"psychoHistory");
 	
 	if (galaxyResources[0].value>0){ document.getElementById("cargoShip").style.display= 'block'; document.getElementById("solarPanel").style.display= 'block'; };
 	if (galaxyResources[1].value>0){ document.getElementById("miningVessel").style.display= 'block'; document.getElementById("propulsion").style.display= 'block';};
@@ -369,8 +847,6 @@ function updateGalaxyButtons(){
 		technoNb+=1;
 	};
 };
-
-// Galaxy buy & updates functions
 
 function BuyGalaxyTechno(Techno){
 	numClick+=1;
@@ -405,7 +881,14 @@ function calculatePercentage(Techno){
 		galaxyTechno[Techno].percentageBuyable=Math.min(100,totalResource/totalCost*100);
 	};
 };
-				
+	
+function psychoHistory(){
+	var pop=totalSoldiers+totalPoliticians+totalProphets;
+	if (pop>=300){
+		// DO SOMETHING - unlock another screen
+	};
+};
+
 function Produce(){
 	galaxyResources[1].cap=100*(1+galaxyTechno.cargoShip.value);
 	galaxyResources[2].cap=100*(1+galaxyTechno.cargoShip.value);
@@ -428,16 +911,29 @@ function Produce(){
 	civilizationScore=	prettifyOnly(galaxyResources[0].value*bonusScore + nbPlanetControlled()*100+ (totalSoldiers + totalPoliticians + totalProphets)/10);
 };
 
-///////////////////////
-// GENERAL FUNCTIONS //
-///////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERAL FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Disable right-click
 document.oncontextmenu = document.body.oncontextmenu = function() {return false;}
 
+// Zoom functions
+
+function toggleZoomPlus() {	
+	ZOOM = Math.min(140,ZOOM+5);
+	document.body.style.zoom=ZOOM+"%";
+	numClick+=1;
+}
+function toggleZoomMinus() {
+	ZOOM = Math.max(60,ZOOM-5);
+	document.body.style.zoom=ZOOM+"%";
+	numClick+=1;
+}  
+
 // Initial alert
 
-if (!read_cookie('civ') && !localStorage.getItem('civ')){
+if (!read_cookie('civ') && !localStorage.getItem('civ')){ // TO DO
 swal({
 	title: "Welcome to Click & Conquer !",
 	html: "</br>You are a supervillain and you desperately want to conquer Earth and establish your dominion over the entire world population.</br></br> Unfortunately for the moment, you are a little bit out of cash ...</br></br>Hit the play button & start stealing some money!</br>",
@@ -538,8 +1034,6 @@ function HidePlayers(){
 	document.getElementById("ShowPlayers").innerHTML="<i style='font-size:10'>Show top 10 active players</i>";
 };
 
-//Windows
-
 function openAchievementsWindow(){
 	document.getElementById("chartsPannel").style.display="none";
 	document.getElementById("achievementPannel").style.display="block";
@@ -567,7 +1061,7 @@ function openStratPage(){
 		myNode.removeChild(myNode.firstChild);
 	};
 	
-	for (var Nb=0; Nb<planets.length; Nb++){
+	for (var Nb=0; Nb<LENGTH; Nb++){
 		CreateDivGalaxy(Nb);
 	};
 	updateGalaxyResources();
@@ -580,20 +1074,33 @@ function closeStratPage(){
 	numClick+=1;
 };
 
+function OptionsWindow(){
+	if(document.getElementById("optionPannel").style.display==="none"){
+		document.getElementById("optionPannel").style.display="block";
+	} else {
+		document.getElementById("optionPannel").style.display="none";
+	};
+};
+
 function openChartsWindow(){
 	document.getElementById("achievementPannel").style.display="none";
 	document.getElementById("chartsPannel").style.display="block";
-	document.getElementById("ChartHeader").innerHTMLy="Planet";
-	for (var Nb=1; Nb<planets.length; Nb++){
+	document.getElementById("ChartHeader").innerHTML="Planet";
+	for (var Nb=1; Nb<LENGTH; Nb++){
 		if(document.getElementById("planetButton"+Nb)===null && planets[Nb].Revealled){
 			CreateDivPlanet(Nb);
 		};
 	};
-	for(var Nb=0; Nb<planets.length;Nb++){
+	for(var Nb=0; Nb<LENGTH;Nb++){
 		for (var i=0;i<8;i++){
 			if (typeof(canvas[Nb][i])!=="undefined"){	
 				canvas[Nb][i].destroy();
 			};
+		};
+	};
+	for(var Nb=0; Nb<LENGTH;Nb++){
+		if (planets[Nb].Active){
+			printCharts(Nb);
 		};
 	};
 	numClick+=1;
@@ -601,18 +1108,20 @@ function openChartsWindow(){
 	
 function printCharts(val){
 	numClick+=1;
-	for(var Nb=0; Nb<planets.length;Nb++){
-		planets[Nb].chartsBeingDisplayed=false;
-		if (typeof(canvas[Nb][0])!=="undefined"){	
-			for (var i=0;i<8;i++){
+	for(var Nb=0; Nb<LENGTH;Nb++){
+		planets[Nb].chartsBeingDisplayed=false;	
+		planets[Nb].Active=false;
+		for (var i=0;i<8;i++){
+			if (typeof(canvas[Nb][i])!="undefined"){
 				canvas[Nb][i].destroy();
 			};
 		};
 	};
+	changePlanet(val);
 	planets[val].chartsBeingDisplayed=true;
 	document.getElementById("ChartHeader").innerHTML=planets[val].Name;
 	var ctxChart = [];
-	for (var nb=0;nb<planets.length;nb++){
+	for (var nb=0;nb<LENGTH;nb++){
 		ctxChart[nb]=[];
 		for (var i=0;i<8;i++){
 			ctxChart[nb][i]=document.getElementById("canvas"+i).getContext("2d");
@@ -631,7 +1140,7 @@ function printCharts(val){
 function closeChartsWindow(){
 	numClick+=1;
 	document.getElementById("chartsPannel").style.display="none";
-	for(var Nb=0; Nb<planets.length;Nb++){
+	for(var Nb=0; Nb<LENGTH;Nb++){
 		planets[Nb].chartsBeingDisplayed=false;
 		if (typeof(canvas[Nb][0])!=="undefined"){	
 			for (var i=0;i<8;i++){
@@ -639,7 +1148,7 @@ function closeChartsWindow(){
 			};
 		};
 	};
-
+	changeChart(4);
 };
 
 function reducePlanetTab(){
@@ -753,9 +1262,9 @@ function Pause(){
 	document.getElementById("PlayImage").src="image/play.png";document.getElementById("PlayImage").style="cursor:pointer";
 };
 
-//////////////////////
-// PLANET FUNCTIONS //
-//////////////////////	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PLANET FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Initialization of all the planets	
 
@@ -768,9 +1277,11 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 		Image: Src,
 		discoveryChanceInit:discoveryChance,
 		discoveryChance:0,
+		Scientists: Scientists,
 		Soldiers: Soldiers,
 		Politicians: Politicians,
 		popPlanet: [1000000,Scientists, Soldiers, Politicians,1000000,1000000,1000000,1000000],
+		PopulationInit: Population,
 		Population: Population,
 		TechLevel: TechLevel,
 		TechLevelText: "",
@@ -786,19 +1297,11 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 		Controlled: false,
 		Lost: false,
 		Active:false,
-		ShowReasearched: false,
 		chartsBeingDisplayed: false,
 		timeCount:0,
-		
-		
 		TIMEPLANET:0,
 		UPGRADESPLANET:0,
 		SHIPSPLANET:0,
-		
-		// MAIN GAME RESOURCES
-		
-		// Main game resources
-		
 		bonusRate: 0,
 		populationCap: 0,
 		stealth: 0,
@@ -815,8 +1318,8 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 		eventDuration: 0,
 		firepowerRate:0,
 		followersRatio:0,
+		stealthEffect:0,
 					
-		// Main resources
 		resources: [
 			money= {
 				name: "money",
@@ -852,7 +1355,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			}
 		],
 		
-		// All population
 		pop: [
 			thiefs= {
 				name: "thief",
@@ -933,7 +1435,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 		
 		totalPopulation: 0,		
 		populationDead: 0,
-		
 		recruitScientistRate:0,
 		recruitSoldierRate:0,
 		recruitPoliticianRate:0,
@@ -968,7 +1469,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			};
 		},
 		
-		// All upgrades with their cost
 		techno: {
 			pickpocketTraining: {
 				cost: [1000,0,0,0],
@@ -1192,9 +1692,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			}
 		},
 		
-		//ACTION METHODS OF THE PLANET
-		
-		// First money click button
 		StealMoney: function(number){
 			numClick+=1; if (!play) {Play();numClick-=1;};
 			if (this.resources[0].value<this.resources[0].cap){
@@ -1202,7 +1699,7 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 				this.resources[0].value = Math.min(this.resources[0].value + number*(1+this.techno.drugLab.effect)*(1+this.techno.armedRobbery.effect)*(1+this.techno.mortgageFund.effect), this.resources[0].cap);
 			};
 			for (var i=0; i<4; i++){
-				if (Math.random()<0.1) {
+				if (Math.random()<0.02) {
 					this.resources[i].value = prettifyOnly(Math.min(this.resources[i].value + number, this.resources[i].cap));
 				};
 			};
@@ -1211,7 +1708,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			updateGameButtons();
 		},
 		 
-		// Works for all population types requiring basic resources
 		Hire: function(nbPop){
 			numClick+=1; if (!play) {Play();numClick-=1;};
 			var buyIsPossible=true;
@@ -1232,12 +1728,9 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 				updateGameResources(); 
 				updateGameButtons(); 
 				NUMPEOPLE+=1;
-				//updateGamePopulation(); // To do
-
 			};
 		},
 		
-		// Kill function which works for all population types 
 		Kill: function(nbPop){
 			if (this.pop[nbPop].value>0){
 				this.pop[nbPop].value-=1;
@@ -1249,7 +1742,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			};
 		},
 		
-		//Random kill function for the Rebellion
 		KillRandom: function(){
 			var sum = 0;
 			var random = (1-Math.random())*this.totalPopulation;
@@ -1273,7 +1765,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			};
 		},
 				
-		//Random kill function for the Planet
 		KillRandomPlanet: function(){
 			var sum = 0;
 			var random = (1-Math.random())*(this.popPlanet[1]+this.popPlanet[2]+this.popPlanet[3]);
@@ -1295,8 +1786,7 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 				};					
 			};
 		},
-		
-		// Repeated function to update production every loop		
+			
 		Produce: function(){ 
 			for (var i=0;i<this.resources.length;i++){
 				if (this.resources[i].value<=this.resources[i].cap && this.resources[i].value>=0){
@@ -1355,14 +1845,11 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 					this.recruitGuruRate-=1;
 				};
 			};		
-			
 			this.calculateMainGameResources();
 			updateGameResources();  
 			updateGameButtons(); 
 		},
 		
-		
-		// Buy a technology
 		BuyTechno: function (Techno){
 			numClick+=1; if (!play) {Play();numClick-=1;};
 			var buyIsPossible=true;
@@ -1371,15 +1858,13 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			};
 			if (buyIsPossible){
 				this.techno[Techno].effect=1;
-				this.techno[Techno].appears=this.ShowReasearched;
-				//document.getElementById(Techno).innerHTML = document.getElementById(Techno).innerHTML+'(Researched)';
+				this.techno[Techno].appears=false;
 				for (var i=0;i<this.resources.length;i++){
 					this.resources[i].value -= this.techno[Techno].cost[i];
 				};
 				this.calculateMainGameResources();
 				updateGameResources();  
 				updateGameButtons(); 
-				
 			};
 		},
 		
@@ -1403,8 +1888,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 				};
 				return Math.floor(Math.max(timeResource[0], timeResource[1], timeResource[2], timeResource[3]));
 				
-				
-				
 			} else { // works for technologies
 				for (var i=0;i<4;i++){
 					if (this.techno[j].cost[i]-this.resources[i].value>0){ totalResource += this.resources[i].value;} else {totalResource += this.techno[j].cost[i];};
@@ -1422,7 +1905,6 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			};	
 		},
 		
-		// Main function to calculate resources, resourcesCap, and main game resources
 		calculateMainGameResources: function(){
 			
 			var totalTechResearched = 0;
@@ -1462,7 +1944,7 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			];
 			
 			// Calculate bonus rate
-			this.bonusRate=(0.9*this.populationDead+10*nbPlanetControlled()+0.1*nbDeathsTotal()+galaxyTechno.intergalacticTrade.value*20)*Math.pow(this.WarEffect,2)/100;
+			this.bonusRate=(0.9*this.populationDead+10*nbPlanetControlled()+0.1*nbDeathsTotal()+galaxyTechno.intergalacticTrade.value*20)*(1+this.stealthEffect)*Math.pow(this.WarEffect,2)/100;
 			
 			// Calculate main resources rates
 			this.pop[0].prod[0]=this.base[0]*(1+this.updatesEffect[0])*(1+this.lobbistEffect[0])*(1+this.resources[0].EventEffect);
@@ -1490,20 +1972,24 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			
 			//Calculate cap for main resources
 			this.resources[0].initialCap = (this.GWP/this.Population+this.popPlanet[3]*800)/4*(1+galaxyTechno["orbitalSupport"].value*0.2);
-			this.resources[0].cap = (this.resources[0].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.techno.blackmail.effect/2)*(1+this.techno.wallStreet.effect)*(1+this.techno.taxHeavens.effect);
+			this.resources[0].cap = (this.resources[0].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.stealthEffect)*(1+this.techno.blackmail.effect/2)*(1+this.techno.wallStreet.effect)*(1+this.techno.taxHeavens.effect);
 			
 			this.resources[1].initialCap =(5000*this.TechLevel+this.popPlanet[2]*800)/3*(1+galaxyTechno["orbitalSupport"].value*0.2);
-			this.resources[1].cap = (this.resources[1].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.techno.internet.effect)*(1+this.techno.wikipedia.effect)*(1+this.techno.IA.effect)*(1+this.techno.blackmail.effect/2);
+			this.resources[1].cap = (this.resources[1].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.stealthEffect)*(1+this.techno.internet.effect)*(1+this.techno.wikipedia.effect)*(1+this.techno.IA.effect)*(1+this.techno.blackmail.effect/2);
 
 			this.resources[2].initialCap =(10000+this.popPlanet[1]*800)/3*(1+galaxyTechno["orbitalSupport"].value*0.2);
-			this.resources[2].cap= (this.resources[2].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.techno.badNeighborhood.effect)*(1+this.techno.submarine.effect)*(1+this.techno.blackmail.effect/2);
+			this.resources[2].cap= (this.resources[2].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.stealthEffect)*(1+this.techno.badNeighborhood.effect)*(1+this.techno.submarine.effect)*(1+this.techno.blackmail.effect/2);
 			
 			this.resources[3].initialCap =(1/this.TechLevel*20000+200*(this.popPlanet[1]+this.popPlanet[2]+this.popPlanet[3]))/3*(1+galaxyTechno["orbitalSupport"].value*0.2);
-			this.resources[3].cap = (this.resources[3].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.techno.buildPyramids.effect)*(1+this.techno.weeklyMeetings.effect)*(1+this.techno.blackmail.effect/2);
+			this.resources[3].cap = (this.resources[3].initialCap+1000*Math.pow(this.totalPopulation,1))*(1+this.stealthEffect)*(1+this.techno.buildPyramids.effect)*(1+this.techno.weeklyMeetings.effect)*(1+this.techno.blackmail.effect/2);
 			
 			// Calculate stealth
-			this.stealth=Math.min(100,this.totalPopulation*(1-this.stupidity)*5-this.pop[6].value*15);
-			
+			this.stealth=Math.min(100,this.totalPopulation*(1-this.stupidity)*5-this.pop[6].value*10);
+			if (this.stealth<100){ 
+				this.stealthEffect=0;
+			} else {
+				this.stealthEffect=-0.25;
+			};
 			// Calculate firepower
 			this.firepower=this.pop[2].value*(1+this.techno.knife.effect)*(1+this.techno.machineGun.effect)*(1+this.techno.ballisticMissile.effect)*(1+this.techno.nanovirus.effect);	
 			this.planetFirepower=this.popPlanet[2]*Math.pow(2,this.TechLevel);
@@ -1522,14 +2008,12 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 			if (this.approval>0) {this.approvalRate = this.approval/(this.approval+this.planetApproval); };
 			
 			// Update recruiter production
-			
 			this.recruitScientistRate+=this.pop[7].recruitScientistNumber*0.0002*100;
 			this.recruitSoldierRate+=this.pop[7].recruitSoldierNumber*0.0002*100;
 			this.recruitPoliticianRate+=this.pop[7].recruitPoliticianNumber*0.0002*100;
 			this.recruitGuruRate+=this.pop[7].recruitGuruNumber*0.0002*100;
 			
 			// Update time till affordable & percentage for line
-			
 			for (var i=0; i<this.pop.length; i++){
 				this.pop[i].timeTillAffordable = this.calculateTimeTillAffordable(i);
 			};
@@ -1606,6 +2090,7 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 				logRandom(this.Name,["Your peace demand was rejected. You fool !","Ahahahaha : you will die !","You never learn, do you ?"],"red");
 			} else {
 				this.War=false;
+				this.WarEffect = 1;
 				logRandom(this.Name,["PEACE : You seem to be lucky. Here, take a peace cookie","PEACE : Let's burrow the war hatchet. Peace is declared","PEACE : Well, seems that you made peace after all ;)","PEACE : Weapons are down. Party time !","PEACE : Well, that's a pretty signature on that peace treaty !"],"green");
 			};
 		},
@@ -1959,7 +2444,7 @@ function discoverPlanet(Name, Src, Scientists, Soldiers, Politicians, Population
 };
 		
 function UpdateTechLevel() {
-	for (var i=0;i<planets.length;i++){			
+	for (var i=0;i<LENGTH;i++){			
 			if 			(planets[i].TechLevel>=4) 									{ planets[i].TechLevelText = "Futuristic"; }
 			else if 	(3<=planets[i].TechLevel && planets[i].TechLevel <4) 		{ planets[i].TechLevelText = "High-tech"; }
 			else if 	(2<=planets[i].TechLevel && planets[i].TechLevel <3) 		{ planets[i].TechLevelText = "Low-tech"; }
@@ -1967,39 +2452,10 @@ function UpdateTechLevel() {
 	};
 };			
 		
-// Initialization of the game
-// Source of the planets name & charact : https://en.wikipedia.org/wiki/List_of_Foundation_universe_planets
+/////////////////////
+// CREATE DIVS //////
+/////////////////////
 
-discoverPlanet('Earth', 'image/planet/i.jpg',30,30,40,7500000000,149000000,75000000000000,'Temperate','Democracy',3,100);
-discoverPlanet('Comporellon', 'image/planet/d.jpg',40,50,10,2500000,10000000,40000000000,'Polar','Autoritarism',3,90);
-discoverPlanet('Aurora', 'image/planet/l.jpg',50,100,40,200000000,25000000,11000000000000,'Harsh','Totalitarism',4,80);
-discoverPlanet('Vega', 'image/planet/q.jpg',12,20,50,1500000000,55000000,7500000000000,'Grassland','Autoritarism',4,60);
-discoverPlanet('Euterpe', 'image/planet/e.jpg',10,25,70,780000000,31000000,46000000000000,'Equatorial','Totalitarism',3,50);
-discoverPlanet('Hesperos', 'image/planet/g.jpg',5,5,5,7200000,250000,150000000000,'Temperate','Totalitarism',2,40);
-discoverPlanet('Solaria', 'image/planet/m.jpg',2,50,0,20000,7800,1200000000,'Arid','Theocracy',4,30);
-discoverPlanet('Alpha', 'image/planet/j.jpg',250,5,5,2000000,15000,32000000000,'Maritime','Democracy',4,20);
-discoverPlanet('Helicon', 'image/planet/r.jpg',3,15,72,2000000,7520000,2000000000,'Temperate','Theocracy',2,10);
-discoverPlanet('Arcturus', 'image/planet/c.jpg',10,120,35,7500000000,2500000000,75000000000000,'Temperate','Totalitarism',2,0);
-discoverPlanet('Derowd', 'image/planet/k.jpg',5,5,250,780000000,31000000,4000000000,'Dry','Democracy',1,0);
-discoverPlanet('Eos', 'image/planet/h.jpg',100,4,45,2500000,7520000000,10000000000,'Ice cap','Totalitarism',4,0);
-discoverPlanet('Kalgan', 'image/planet/p.jpg',72,200,180,120000000000,550000000,110000000000000000,'Semi-tropical','Totalitarism',4,0);
-discoverPlanet('Terminus', 'image/planet/b.jpg',250,75,75,10200000000,55000000,7500000000000000,'Tropical','Democracy',4,0);
-discoverPlanet('Trantor', 'image/planet/o.jpg',50,60,220,15000000000,194000000,850000000000000,'Humid continental','Autoritarism',4,0);
-discoverPlanet('Gaia', 'image/planet/p.jpg',500,500,500,1000000000,10000000,100000000000,'Continental','Theocracy',1,0);
-discoverPlanet('Gamma', 'image/planet/a.jpg',5,5,5,10000000,10000000,85000000000,'Lunar','Totalitarism',2,0);
-
-planets[0].Revealled=true;
-planets[0].Active=true;
-
-for (var i=0;i<planets.length;i++){
-	planets[i].calculateMainGameResources();
-};
-planets[0].calculateMainGameResources();planets[0].Initialize();
-updateGameResources();
-updateGameButtons();
-updateMainPlanetData();
-
-// Creates a new planet in the Chart tab
 function CreateDivPlanet(Nb){
 	var li = document.createElement('li');
 	var span = document.createElement('span');
@@ -2021,12 +2477,12 @@ function createDivPlayer(K){
 
 function createDivEvent(Year,Name,Text,Class){
 	var tr = document.createElement('tr');
+	if (Year==="Jan 0") {Year="---";};
 	tr.innerHTML = "<td width=40px>"+Year+"</td><td width=40px>"+Name+"</td><td>"+Text+"</td>";
 	tr.className=Class+ " LOG";
-	document.getElementById("logTable").appendChild(tr);
+	document.getElementById("logTable").insertBefore(tr,document.getElementById("logTable").firstChild );
 };
 
-// Creates a new planet in the Galaxy tab
 function CreateDivGalaxy(Nb){
 	
 	var DisclaimerPlanet= document.createElement('div');
@@ -2061,7 +2517,7 @@ function CreateDivGalaxy(Nb){
 	Text0Planet.setAttribute('class', 'PlanetTextVertical');
 	var span = document.createElement('span');
 	span.innerHTML = "<b>"+planets[Nb].Name+"</b>";
-	span.setAttribute('style', 'writing-mode:vertical-rl;');
+	//span.setAttribute('style', 'writing-mode:vertical-rl;');
 	Text0Planet.appendChild(span);
 	
 	planets[Nb].calculateMainGameResources();
@@ -2119,22 +2575,28 @@ function CreateDivGalaxy(Nb){
 	};
 }
 
-// New planet discovery
+//////////////////////////
+// PLANET FUNCTIONS //////
+//////////////////////////
 
 function BuyShip(){
 	numClick+=1; if (!play) {Play();numClick-=1;};
 	galaxyResources[0].value+=1;
 	SHIPS+=1;
 	Achievements["pauliac"].reached=true;
-	for (var Nb=0;Nb<planets.length;Nb++){
+	for (var Nb=0;Nb<LENGTH;Nb++){
 		if (planets[Nb].Active){
 			planets[Nb].SHIPSPLANET+=1;
 		};
 	};
-	if (galaxyResources[0].value===1) {
+	
+	if (SHIPS===1) {
 		openStratPage();
-		swal({title: "Space travel !", html: "You constructed a ship </br></br> You now have access to the galaxy strategic pannel to explore & conquer other planets", imageUrl: "image/Spaceship.jpg"});
-		document.getElementById("changeScreenStrat").display="block";
+		swal({title: "Space travel !", html: "You constructed a ship </br></br> You now have access to the galaxy strategic panel to explore & conquer other planets", imageUrl: "image/Spaceship.jpg"});
+		document.getElementById("LeftImage").style.display="inline-block";
+		document.getElementById("changeScreenPlanet").style.display="inline-block";
+		document.getElementById("RightImage").style.display="inline-block";
+		document.getElementById("ChangeScreenStrat").style.display="inline-block";
 	}
 };
 
@@ -2219,7 +2681,7 @@ function updateShipStatus(Nb){
 }
 		
 function discoverNewPlanet(Nb){
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Active){
 			 planets[i].Active=false;
 		};
@@ -2234,7 +2696,7 @@ function discoverNewPlanet(Nb){
 // Switch between planets
 
 function updateOnclickChange(planetNb){
-	document.getElementById("moneyButton").onclick		= function () { planets[planetNb].StealMoney(2500); };	
+	document.getElementById("moneyButton").onclick		= function () { planets[planetNb].StealMoney(25); };	
 	document.getElementById("thiefButton").onclick		= function () { planets[planetNb].Hire(0); };
 	document.getElementById("scientistButton").onclick	= function () { planets[planetNb].Hire(1); };
 	document.getElementById("soldierButton").onclick	= function () { planets[planetNb].Hire(2); };
@@ -2311,6 +2773,7 @@ function updateOnclickChange(planetNb){
 // Switch planet functions
 
 function changePlanet(Nb){
+	
 	planets[Nb].Active=true;
 	planets[Nb].calculateMainGameResources();
 	planets[Nb].Initialize();
@@ -2331,7 +2794,7 @@ var NB=0;
 
 function nextPlanet(Nb){
 	NB=Nb;
-	var L= planets.length;
+	var L= LENGTH;
 	if (NB+1<L){
 		NB+=1;
 		if (!planets[NB].Revealled) {
@@ -2348,7 +2811,7 @@ function nextPlanet(Nb){
 
 function previousPlanet(Nb){
 	NB=Nb;
-	var L= planets.length;
+	var L= LENGTH;
 	if (NB>0){
 		NB-=1;
 		if (!planets[NB].Revealled) {
@@ -2366,13 +2829,14 @@ function previousPlanet(Nb){
 function changePlanetPlus(){
 	numClick+=1;
 	var Nb=0;
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Active){
 			Nb=i;
 		};
 	};
 	planets[Nb].Active=false;
 	nextPlanet(Nb);
+	if (document.getElementById("chartsPannel").style.display==="block"){closeChartsWindow();};
 	changePlanet(NB);
 	var displayedChartTransition=displayedChart;
 	displayedChart="Null";
@@ -2382,13 +2846,14 @@ function changePlanetPlus(){
 function changePlanetMoins(){
 	numClick+=1;
 	var Nb=0;
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Active){
 			Nb=i;
 		};
 	};
 	planets[Nb].Active=false;
 	previousPlanet(Nb);
+	if (document.getElementById("chartsPannel").style.display==="block"){closeChartsWindow();};
 	changePlanet(NB);
 	var displayedChartTransition=displayedChart;
 	displayedChart="Null";
@@ -2397,17 +2862,15 @@ function changePlanetMoins(){
 
 function selectPlanet(Nb){
 	numClick+=1; 
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		planets[i].Active=false;
 	};
 	planets[Nb].Active=true;
-	
+	if (document.getElementById("chartsPannel").style.display==="block"){closeChartsWindow();};
 	changePlanet(Nb);
-	
 	var displayedChartTransition=displayedChart;
 	displayedChart="Null";
 	changeChart(displayedChartTransition);
-	
 	closeStratPage();
 };	
 
@@ -2417,11 +2880,9 @@ function selectPlanet(Nb){
 
 // Global achievement functions
 
-var AchievementsReached=0;
-
 function nbPlanetControlled(){
 	var k=0;
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Controlled){
 			k+=1;
 		};
@@ -2430,7 +2891,7 @@ function nbPlanetControlled(){
 };
 function nbDeathsTotal(){
 	var k=0;
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		k+=planets[i].populationDead;
 	};
 	return k;
@@ -2442,7 +2903,7 @@ function verifyAchievements(){
 	if (nbDeathsTotal()>=10){Achievements["khan"].reached=true;};
 	if (planets[0].UPGRADESPLANET===44){Achievements["ELI5"].reached=true;};
 	
-	for (var Nb=0;Nb<planets.length;Nb++){
+	for (var Nb=0;Nb<LENGTH;Nb++){
 		if (planets[Nb].Controlled) { Achievements["cesar"].reached=true; };
 		if (planets[Nb].resources[0].value>=1000000){ Achievements["gates"].reached=true; };
 		if (planets[Nb].pop[3].value>=30){ Achievements["kabila"].reached=true; };
@@ -2457,31 +2918,15 @@ function verifyAchievements(){
 	};
 };
 
-var Achievements = {
-	jobInterview: {name: "Job interview", condition: "Recruit someone", reached: false},
-	cesar: {name: "Ave, Cesar", condition: "Conquer a planet by any mean", reached: false},
-	trump: {name: "Donald Trump", condition: "Conquer a planet through politics", reached: false},
-	rael: {name: "Hallelujah", condition: "Conquer a planet through religion", reached: false},
-	putin: {name: "Vladimir Putin", condition: "Conquer a planet through military power", reached: false},
-	hillary: {name: "Hillary Clinton", condition: "Loose a planet", reached: false},
-	napoleon: {name: "Napoleon", condition: "Conquer 10 planets", reached: false},
-	pauliac : {name: "F. Pauliac", condition: "Build a ship", reached: false},
-	gates: {name: "Bill Gates", condition: "Reach 1 M$", reached: false},
-	kabila: {name: "Kabila", condition: "Have 30 politicians or more on a planet", reached: false},
-	jesus: {name: "Jesus", condition: "Have 30 prophets or more on a planet", reached: false},
-	bonus: {name: "A. Estanislao", condition: "Reach a bonus rate of 100%", reached: false},
-	cap: {name: "Uncle Scrooge", condition: "Double the resources' cap", reached: false},
-	khan: {name: "Gengis Khan", condition: "More than 100 deaths", reached: false},
-	addict: {name: "Addict", condition: "Play for more than 10 days", reached: false},
-	beginner: {name: "Way to go", condition: "Play for more than 2 hours", reached: false},
-	pandora: {name: "Pandora", condition: "Reach 42 unobtainium", reached: false},
-	click:{name: "Just. One. More.", condition: "5181 clicks", reached: false},
-	// TO DO thankyou:{name: "Thank you !", condition: "Share this game", reached: false},
-	// TO DO goldstar:{name: "Reddit gold", condition: "Contribute to the game development", reached: false},
-	ELI5:{name: "ELI5", condition: "Research all updates on Earth", reached: false},
-	CivVI:{name: "Civilization VI", condition: "Reach a civilization score of 1000", reached:false}
+function nbAchievements(){
+	var total=0;
+	for (var achievement in Achievements){
+		if (Achievements[achievement].reached){
+			total+=1;
+		};
+		return total;
+	};
 };
-
 
 function createDivAchievement(Achievement){
 	if (document.getElementById(Achievements[Achievement].name)===null){
@@ -2505,26 +2950,10 @@ function createDivAchievement(Achievement){
 	};
 };
 
-// Not used in order not to add too many alerts
-
-/*function reachAnAchievement(Achievement){
-	AchievementsReached+=1;
-	Achievements[Achievement].reached=true;
-	swal({
-		title: "Achievement unlocked!",
-		text: Achievements[Achievement].name+" - "+Achievements[Achievement].condition,
-		timer: 3000,
-		showConfirmButton: true,
-		imageUrl: "image/Achievement.png"
-	});
-};*/ 
-
 function updateStats(){
-	
 	var BONUSRATE2=10*nbPlanetControlled()+0.1*nbDeathsTotal()+galaxyTechno.intergalacticTrade.value*20;
 	var TIMEPLAYED=duration(Time*10);
 	var TIMEREALLYPLAYED=duration(YearsREALLYPLAYED*10);
-	
 	UpdateValue("NUMCLICKS",numClick,0);
 	UpdateValue("SHIPS",SHIPS,0);
 	UpdateValue("PLANETSCONQUERED",nbPlanetControlled(),0);
@@ -2535,15 +2964,16 @@ function updateStats(){
 	UpdateValue("TIMEPLAYED",TIMEPLAYED,0);
 	UpdateValue("TIMEREALLYPLAYED",TIMEREALLYPLAYED,0);
 	UpdateValue("CIVILIZATIONSCORE",civilizationScore,0);
-
-	for (var Nb=0;Nb<planets.length;Nb++){
+	for (var Nb=0;Nb<LENGTH;Nb++){
 		if (planets[Nb].Active){
+			UpdateValue("PLANETNAME",planets[Nb].Name,0);
 			UpdateValue("TIMEPLANET",duration(planets[Nb].TIMEPLANET*10),0);
 			UpdateValue("UPGRADESPLANET",planets[Nb].UPGRADESPLANET,0);
 			UpdateValue("POPULATIONPLANET",planets[Nb].totalPopulation,0);
 			UpdateValue("SHIPSPLANET",planets[Nb].SHIPSPLANET,0);
 		};
 	};
+	UpdateValue("nbAchievements", nbAchievements(),0);
 };				
 
 ////////////
@@ -2556,7 +2986,6 @@ var eventRessource = [
 	{ logArray:["This is your lucky day", "Look what I found on the plane", "You have dinner with the mafia", "You find an old battlefield"], ressource:2},
 	{ logArray:["This is your lucky day", "Wololo wololo wololo", "Bring your kid to church week", "Public stoning"], ressource:3}
 ];
-
 var eventRate = [
 	{ logArray:["It's dividends time", "Your drug cartel finds a new delivery system", "You hacked the bank computer system", "People don't trust the system anymore and carry lots of cash"], ressource:0},
 	{ logArray:["Rise of science salaries", "Nerds are becoming less popular and focus on their work", "NASA fundings", "Publication of fake papers"], ressource:1},
@@ -2567,11 +2996,10 @@ var eventRate = [
 	{ logArray:["Peace treaty signed - civil war ended" ,"Embargo in the developping countries", "No more steel for ammunition", "Reduction of armed robberies"], ressource:2},
 	{ logArray:["Death of the pope", "Scientific discovery contradicts the Holly Book", "Church child abuse", "A prophet has a headache"], ressource:3},
 ];
-
 var eventPop = ["THE DELUGE", "NUCLEAR MELTDOWN", "METEORITE", "SUPERVOLCANO", "BUBONIC PLAGUE", "EBOLA"];
 
 function selectRandomRevealledPlanet(){
-	var J=Math.min(planets.length-1,Math.floor(Math.random()*planets.length));
+	var J=Math.min(LENGTH-1,Math.floor(Math.random()*LENGTH));
 	if (planets[J].Revealled) {
 		return J;
 	} else {
@@ -2581,7 +3009,7 @@ function selectRandomRevealledPlanet(){
 
 function createEvent(){
 	
-	if (Math.random()<0.0001 && timeBetweenEvents1===0){
+	if (Math.random()<0.001 && timeBetweenEvents1===0){
 		var J=selectRandomRevealledPlanet();
 		if (!planets[J].Lost && planets[J].Revealled){
 			var I=Math.min(eventRessource.length-1, Math.floor(Math.random()*eventRessource.length));
@@ -2592,8 +3020,7 @@ function createEvent(){
 			planets[J].resources[eventRessource[I].ressource].value=Math.min(planets[J].resources[eventRessource[I].ressource].value+Value,planets[J].resources[eventRessource[I].ressource].cap);
 		};
 	};
-	
-	if (Math.random()<0.00001 && timeBetweenEvents2===0){
+	if (Math.random()<0.0001 && timeBetweenEvents2===0){
 		var J=selectRandomRevealledPlanet();
 		if (!planets[J].Lost && planets[J].Revealled){
 			var K=Math.min(eventRate[I].logArray.length-1,Math.floor(Math.random()*eventRate[I].logArray.length)); 
@@ -2611,8 +3038,7 @@ function createEvent(){
 			timeBetweenEvents2=60;
 		};
 	};
-	
-	if (Math.random()<0.000001 && timeBetweenEvents3===0){
+	if (Math.random()<0.00001 && timeBetweenEvents3===0){
 		var J=selectRandomRevealledPlanet();
 		if (!planets[J].Lost && planets[J].Revealled){
 			var Value1 = Math.floor(Math.random()*25);
@@ -2638,11 +3064,9 @@ function createEvent(){
 function log(planet,message,className){
 	createDivEvent(monthsTime(),planet,message,className);
 };
-
 function logRandom(planet, Array,typeOfEvent){
 	log(planet,Array[Math.floor(Math.random()*Array.length)],typeOfEvent);
 };
-
 function clearLog(){
 	document.getElementById("logTable").innerHTML="";
 	numClick+=1;
@@ -2678,7 +3102,7 @@ function UpdateTimeTill(Id, value){
 };
 
 function updateMainPlanetData(){
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Active){
 			
 			document.getElementById("PlanetImage").src=planets[i].Image;
@@ -2698,7 +3122,7 @@ function updateMainPlanetData(){
 };
 
 function updateGameResources(){
-	for (var i=0;i<planets.length;i++){
+	for (var i=0;i<LENGTH;i++){
 		if (planets[i].Active){
 					
 			UpdateValue("stealth",planets[i].stealth,1); 
@@ -2788,6 +3212,7 @@ function updateGameResources(){
 			document.getElementById("bonusRateconqPlanet").innerHTML=prettifyOnly(10*nbPlanetControlled())+"%";
 			document.getElementById("bonusRatetotpopDead").innerHTML=prettifyOnly(0.1*nbDeathsTotal())+"%";
 			document.getElementById("bonusRategalaxyUpdates").innerHTML=galaxyTechno.intergalacticTrade.value*20+"%";
+			document.getElementById("bonusRatestealthEffect").innerHTML=prettifyOnly(planets[i].stealthEffect*100,2)+"%";
 			document.getElementById("bonusRatewarEffect").innerHTML="<i>x "+prettifyOnly(Math.pow(planets[i].WarEffect,2))+"</i>";
 		};
 	};
@@ -2795,7 +3220,7 @@ function updateGameResources(){
 
 function disactivateAllButtons(){
 	//CAREFUL ! This function does not prevent from clicking, it just changes the button style
-	for (var nb=0;nb<planets.length;nb++){
+	for (var nb=0;nb<LENGTH;nb++){
 		if (planets[nb].Active){
 			for (var j in planets[nb].techno){
 				document.getElementById(j).className = 'TT ActionButtonDisabled';
@@ -2820,9 +3245,9 @@ function disactivateAllButtons(){
 	
 
 function updateGameButtons(){
-	for (var nb=0;nb<planets.length;nb++){
+	for (var nb=0;nb<LENGTH;nb++){
 		if (planets[nb].Active){
-			
+
 			//Existence des boutons
 			if (planets[nb].techno.pickpocketTraining.effect >0){		document.getElementById('thiefButton').style.display = 'block';};
 			if (planets[nb].techno.mercenaries.effect >0){				document.getElementById('soldierButton').style.display = 'block';};
@@ -2841,7 +3266,7 @@ function updateGameButtons(){
 					buyIsPossible[j] = buyIsPossible[j] && (planets[nb].resources[i].value >= planets[nb].pop[j].cost[i]) ;
 				};
 			};			
-			var enoughCapacity= (planets[nb].totalPopulation<planets[nb].populationCap) // Nécessité de rajouter le fait qu'il y ait assez de soldats ennemis ?? ...			
+			var enoughCapacity= (planets[nb].totalPopulation<planets[nb].populationCap) // Nécessité de rajouter le fait qu'il y ait assez de soldats ennemis ??			
 			for (var j=0;j<planets[nb].pop.length;j++){
 				for (var k=0;k<4;k++){
 					UpdateColorValue(planets[nb].resources[k].value >= planets[nb].pop[j].cost[k],planets[nb].pop[j].name+planets[nb].resources[k].name+"Cost");
@@ -2988,7 +3413,7 @@ var displayedChart="Null";
 function changeChart(val){
 	numClick+=1;
 	for (var i=0;i<8;i++){
-		for(var Nb=0; Nb<planets.length;Nb++){
+		for(var Nb=0; Nb<LENGTH;Nb++){
 			if (typeof(canvas[Nb][i])!=="undefined"){	
 				canvas[Nb][i].destroy();
 			};
@@ -2996,7 +3421,7 @@ function changeChart(val){
 	};
 	displayedChart=val;
 	
-	for(var Nb=0; Nb<planets.length;Nb++){
+	for(var Nb=0; Nb<LENGTH;Nb++){
 		
 		if (planets[Nb].Active){	
 			if (val>=0 && val<4){
@@ -3014,8 +3439,8 @@ function changeChart(val){
 	};
 };
 
-var ctx = [];
-for (var nb=0;nb<planets.length;nb++){
+
+for (var nb=0;nb<LENGTH;nb++){
 	ctx[nb]=[];
 	for (var i=0;i<8;i++){
 		ctx[nb][i]=document.getElementById("canvas").getContext("2d");
@@ -3024,10 +3449,7 @@ for (var nb=0;nb<planets.length;nb++){
 
 ////////////////////////////   Resources Charts   //////////////////////////
 
-var canvas=[];
-var configChart=[];
-
-for (var nb=0;nb<planets.length;nb++){
+for (var nb=0;nb<LENGTH;nb++){
 
 	configChart[nb]= new Array(8);
 	canvas[nb]= new Array(8);
@@ -3136,9 +3558,7 @@ for (var nb=0;nb<planets.length;nb++){
 
 //////////////////////////// Chart of All Resources //////////////////////////////
 
-var resourcesChart=[];
-
-for (var nb=0;nb<planets.length;nb++){
+for (var nb=0;nb<LENGTH;nb++){
 
 		resourcesChart[nb] = {
 		type: 'bar',
@@ -3244,9 +3664,7 @@ for (var nb=0;nb<planets.length;nb++){
 
 //////////////////////////// Chart of All Planet Status //////////////////////////////
 
-var statusChart=[];
-
-for (var nb=0;nb<planets.length;nb++){
+for (var nb=0;nb<LENGTH;nb++){
 
 		statusChart[nb] = {
 		type: 'polarArea',
@@ -3283,9 +3701,7 @@ for (var nb=0;nb<planets.length;nb++){
 	
 //////////////////////////// Chart of Population //////////////////////////////
 
-var popChart=[];
-
-for (var nb=0;nb<planets.length;nb++){
+for (var nb=0;nb<LENGTH;nb++){
 
 		popChart[nb] = {
 		type: 'polarArea',
@@ -3322,9 +3738,7 @@ for (var nb=0;nb<planets.length;nb++){
 	
 //////////////////////////// Chart of Win situation //////////////////////////////
 
-var winChart=[];
-
-for (var nb=0;nb<planets.length;nb++){
+for (var nb=0;nb<LENGTH;nb++){
 		
 		winChart[nb] = {
 		type: 'bar',
@@ -3561,12 +3975,7 @@ function suppressRadar(Nb){
 	
 };
 
-
 // General functions for plotting charts
-
-var dataCap=[];
-var dataRate=[];
-var dataValue=[];
 
 function addDataGraph(planetNb,resource,dataset,value){	
 	var lastlabel=configChart[planetNb][resource].data.datasets[dataset].data.length;
@@ -3592,11 +4001,6 @@ function updateDataGraph(planetNb,resource,dataset,value){
 // LOOP //
 //////////
 
-var timerClick=100;
-var biggerTimerClick=3600;
-var numClickPrevious=0;
-var autosaveCounter = 0;
-var autosave="on";
 document.getElementById("Titre9").style.display = 'none';
 
 window.setInterval(function(){
@@ -3612,7 +4016,7 @@ window.setInterval(function(){
 	if (play && (planets[0].resources[0].value !== 0 || Time!==0)){
 		
 
-		for(var nb=0; nb<planets.length;nb++){
+		for(var nb=0; nb<LENGTH;nb++){
 				
 				if(planets[nb].timeCount >0){
 					planets[nb].timeCount-=1;
@@ -3649,8 +4053,6 @@ window.setInterval(function(){
 					timeBetweenEvents3=Math.max(timeBetweenEvents3-1,0);
 					createEvent();
 					
-					// Update of the Money chart
-					
 					for (var i=0;i<4;i++){
 						if (oldResources[i].value!==planets[nb].resources[i].value || planets[nb].resources[i].value < planets[nb].resources[i].cap || oldResources[i].rate!==planets[nb].resources[i].rate) {
 							addDataGraph(nb,i,0,prettifyOnly(planets[nb].resources[i].value));
@@ -3672,7 +4074,7 @@ window.setInterval(function(){
 				};
 		};
 		
-		for(var nb=0; nb<planets.length;nb++){
+		for(var nb=0; nb<LENGTH;nb++){
 			if (planets[nb].Active || planets[nb].chartsBeingDisplayed){
 				if (displayedChart === 4 || planets[nb].chartsBeingDisplayed){
 					for (var i=0;i<4;i++){
@@ -3746,7 +4148,7 @@ window.setInterval(function(){
 		timerClick-=1;
 		biggerTimerClick-=1;
 		
-		for(var nb=0; nb<planets.length;nb++){
+		for(var nb=0; nb<LENGTH;nb++){
 			if (planets[nb].Revealled){
 				planets[nb].TIMEPLANET+=0.1;
 			};
